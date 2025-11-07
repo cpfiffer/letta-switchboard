@@ -1,0 +1,14 @@
+# Binaries
+letta-schedules
+letta-schedules-*
+*.exe
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store

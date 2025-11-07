@@ -422,16 +422,24 @@ async def execute_schedule(
     execute_at: str = None,
 ):
     logger.info(f"Executing {schedule_type} schedule {schedule_id} for agent {agent_id}")
-    
+
+    # Reload volume to see latest changes (in case schedule was deleted)
+    volume.reload()
+
     # Check if schedule still exists before executing
     if schedule_type == "one-time" and execute_at:
         file_path = get_onetime_schedule_path(api_key, execute_at, schedule_id)
     else:
         file_path = get_recurring_schedule_path(api_key, schedule_id)
-    
+
     schedule = load_schedule(file_path)
     if not schedule:
-        logger.warning(f"Schedule {schedule_id} no longer exists, skipping execution")
+        # For one-time schedules, this is expected (already executed or deleted)
+        # For recurring schedules, this indicates the schedule was deleted by the user
+        if schedule_type == "one-time":
+            logger.debug(f"One-time schedule {schedule_id} not found (already executed or deleted)")
+        else:
+            logger.info(f"Recurring schedule {schedule_id} was deleted, skipping execution")
         return {"success": False, "error": "Schedule deleted"}
     
     # For one-time schedules: DELETE IMMEDIATELY to prevent race condition
@@ -549,6 +557,10 @@ def cleanup_empty_directories():
 )
 async def check_and_execute_schedules():
     logger.info("Checking schedules...")
+
+    # Reload volume to see latest changes (deletes, updates, etc.)
+    volume.reload()
+
     current_time = datetime.now(timezone.utc)
     
     # Check recurring schedules (all users)
