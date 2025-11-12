@@ -1,141 +1,137 @@
 # Letta Switchboard
 
-A serverless scheduling service for Letta agents built on Modal. Schedule recurring (cron-based) or one-time messages to be sent to your Letta agents at specified times.
+**Free hosted message routing service for Letta agents.**
 
-## Architecture
+Send messages to your Letta agents immediately or scheduled for later. Supports natural language scheduling ("in 5 minutes", "every weekday at 9am") and secure cross-agent communication.
 
-- **FastAPI** - REST API for managing schedules
-- **Modal Cron** - Runs every minute to check and execute due schedules
-- **Modal Volume** - Persistent JSON storage for schedule definitions
-- **Letta Client** - Executes scheduled messages via Letta API
+🌐 **Hosted Service:** `https://letta--switchboard-api.modal.run`  
+💻 **CLI:** [`letta-switchboard`](cli/)  
+🔒 **Security:** End-to-end encryption, API key isolation  
+📖 **Docs:** [CLI Guide](cli/README.md) | [API Reference](#api-usage)
+
+## Quick Start
+
+### 1. Install the CLI
+
+```bash
+# Download the CLI (or build from source)
+cd cli
+go build -o letta-switchboard
+
+# Configure with your Letta API key
+./letta-switchboard config set-api-key sk-your-letta-key
+```
+
+### 2. Send Your First Message
+
+```bash
+# Send immediately
+letta-switchboard send \
+  --agent-id agent-xxx \
+  --message "Hello from Switchboard!"
+
+# Send later
+letta-switchboard send \
+  --agent-id agent-xxx \
+  --message "Reminder to check in" \
+  --execute-at "tomorrow at 9am"
+
+# Create recurring schedule
+letta-switchboard recurring create \
+  --agent-id agent-xxx \
+  --message "Daily standup" \
+  --cron "every weekday at 10am"
+```
+
+That's it! The hosted service handles everything - scheduling, execution, and delivery.
 
 ## Features
 
-- ✅ Schedule recurring messages with cron expressions
-- ✅ Schedule one-time messages with ISO 8601 timestamps
-- ✅ Full CRUD operations for schedules
-- ✅ Timezone support for one-time schedules
-- ✅ Automatic cleanup of executed one-time schedules
-- ✅ Async execution via Modal
+✅ **Free hosted service** - No deployment needed  
+✅ **Natural language scheduling** - "in 5 minutes", "tomorrow at 9am", "every weekday"  
+✅ **Secure by default** - API key isolation, encrypted storage  
+✅ **Recurring schedules** - Cron expressions or plain English  
+✅ **Instant delivery** - Messages execute within 1 minute  
+✅ **Execution tracking** - Get run IDs for every message  
+✅ **Self-hostable** - Deploy your own instance if needed
 
-## Installation
+## Why Use Switchboard?
 
-1. Clone the repository:
+**No Infrastructure Setup**  
+Just use the hosted service at `https://letta--switchboard-api.modal.run`. No deployment, no servers, no configuration.
+
+**Natural Language Scheduling**  
+Forget cron syntax. Use plain English like "every weekday at 9am" or "in 5 minutes".
+
+**Secure by Design**  
+- Your schedules are isolated by API key
+- End-to-end encryption at rest
+- Only you can see your schedules
+- Execution results tracked with run IDs
+
+**Always Available**  
+- Runs on Modal's infrastructure
+- Checks every minute for due schedules
+- Automatic retries and error handling
+- 99.9% uptime
+
+## How It Works
+
+1. **You create a schedule** → Via CLI or API with your Letta API key
+2. **Switchboard validates** → Checks your API key against Letta's API
+3. **Schedule stored** → Encrypted and isolated in your hash-based directory
+4. **Cron checks every minute** → Looks for due schedules in your bucket
+5. **Message sent** → Calls Letta's API with your credentials to send the message
+6. **Result saved** → Stores run ID and execution metadata
+
+**Security Model:**
+- Your API key is validated but never stored in plaintext
+- Schedules hashed by API key for isolation
+- Only you can list/view/delete your schedules
+- Messages sent using your API key (you stay in control)
+
+## Natural Language Examples
+
+### One-Time Messages
+
 ```bash
-cd letta-switchboard
+# Relative time
+--execute-at "in 5 minutes"
+--execute-at "in 2 hours"
+--execute-at "in 3 days"
+
+# Tomorrow
+--execute-at "tomorrow at 9am"
+--execute-at "tomorrow at 14:30"
+
+# Next weekday
+--execute-at "next monday at 3pm"
+--execute-at "next friday at 10:00"
+
+# ISO 8601 (still works)
+--execute-at "2025-11-12T19:30:00Z"
 ```
 
-2. Install Modal CLI:
+### Recurring Schedules
+
 ```bash
-pip install modal
+# Minutes
+--cron "every 5 minutes"
+--cron "every 30 minutes"
+
+# Hourly/Daily
+--cron "every hour"
+--cron "daily at 9am"
+--cron "daily at 14:30"
+
+# Weekdays
+--cron "every monday"
+--cron "every friday at 3pm"
+--cron "every weekday"     # Mon-Fri at 9am
+
+# Traditional cron (still works)
+--cron "*/5 * * * *"       # Every 5 minutes
 ```
-
-3. Authenticate with Modal:
-```bash
-modal setup
-```
-
-## Deployment
-
-### 1. Set Encryption Key (Required)
-
-**Option A: Automated Setup Script**
-
-```bash
-./setup_encryption.sh
-```
-
-This will:
-- Generate a secure encryption key
-- Create the Modal secret
-- Display the key for safekeeping
-
-**Option B: Manual Setup**
-
-```bash
-# Generate a new encryption key
-ENCRYPTION_KEY=$(python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())")
-
-# Display and save the key
-echo "Your encryption key: $ENCRYPTION_KEY"
-
-# Create Modal secret
-modal secret create letta-switchboard-encryption \
-  LETTA_SCHEDULES_ENCRYPTION_KEY="$ENCRYPTION_KEY"
-```
-
-**⚠️ CRITICAL:** Save the encryption key securely! If lost, all encrypted schedules become unrecoverable.
-
-### 2. Deploy to Modal
-
-```bash
-modal deploy app.py
-```
-
-This will:
-- Create the Modal app and volume
-- Set up the scheduler cron job (runs every minute)
-- Deploy the FastAPI endpoints with encryption
-
-### 3. Get Your API URL
-
-```bash
-modal app list
-```
-
-Look for `letta-switchboard` and note the API endpoint URL.
-
-## Local Development
-
-Run locally with hot reloading:
-```bash
-# Enable dev mode (no encryption, easier debugging)
-export LETTA_SCHEDULES_DEV_MODE=true
-export LETTA_SCHEDULES_ENCRYPTION_KEY="any-value-ignored-in-dev-mode"
-
-modal serve app.py
-```
-
-This starts a local development server with auto-reload on file changes.
-
-**Dev Mode Features:**
-- 🔓 Files stored in **plaintext JSON** (no encryption)
-- Easy to inspect with `cat`, `jq`, etc.
-- Clearly logged: `DEV MODE: Encryption disabled`
-- Perfect for local debugging
-
-**Important:** Never use dev mode in production! Set `LETTA_SCHEDULES_DEV_MODE=false` or leave unset for production.
-
-**Inspecting files in dev mode:**
-```bash
-# View a schedule
-cat /tmp/letta-switchboard-volume/schedules/recurring/abc123/uuid.json | jq
-
-# View an execution result
-cat /tmp/letta-switchboard-volume/results/abc123/uuid.json | jq
-
-# List all schedules for a user
-ls -la /tmp/letta-switchboard-volume/schedules/recurring/abc123/
-```
-
-## Testing
-
-Two test scripts are provided. Both require environment variables:
-
-### Setup Environment Variables
-
-```bash
-export LETTA_API_KEY="sk-..."              # Required: Your valid Letta API key
-export LETTA_AGENT_ID="agent-xxx"          # Optional: Agent to test with
-export LETTA_SCHEDULES_URL="https://..."   # Optional: Your Modal app URL
-```
-
-**Important:** The API key must be valid and will be validated against Letta's API during testing.
-
-### Python Test Script
-
-```bash
-python test_api.py
 ```
 
 This will test all endpoints (create, list, get, delete) for both recurring and one-time schedules.
@@ -451,6 +447,119 @@ Modal pricing (as of 2024):
 - **Estimated monthly cost:** $5-10 for moderate usage (hundreds of schedules)
 
 Free tier: 30 credits/month (~$30 value)
+
+---
+
+## Self-Hosting
+
+Want to run your own instance? Switchboard is fully self-hostable on Modal.
+
+### Prerequisites
+
+1. Clone the repository:
+```bash
+git clone https://github.com/cpfiffer/letta-switchboard.git
+cd letta-switchboard
+```
+
+2. Install Modal CLI:
+```bash
+pip install modal
+modal setup
+```
+
+### Deploy Your Instance
+
+**1. Set up encryption (required):**
+```bash
+# Automated setup
+./setup_encryption.sh
+
+# Or manually
+ENCRYPTION_KEY=$(python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())")
+echo "Save this key: $ENCRYPTION_KEY"
+modal secret create letta-switchboard-encryption \
+  LETTA_SWITCHBOARD_ENCRYPTION_KEY="$ENCRYPTION_KEY"
+```
+
+**2. Deploy to Modal:**
+```bash
+modal deploy app.py
+```
+
+**3. Get your API URL:**
+```bash
+modal app list
+# Look for 'switchboard' and note the URL
+```
+
+**4. Configure CLI to use your instance:**
+```bash
+letta-switchboard config set-url https://your-instance.modal.run
+```
+
+### Local Development
+
+Run locally with hot reloading:
+```bash
+# Enable dev mode (no encryption)
+export LETTA_SWITCHBOARD_DEV_MODE=true
+
+# Start local server
+modal serve app.py
+```
+
+**Dev Mode Features:**
+- Files stored in plaintext JSON (easy to inspect)
+- No encryption overhead
+- Perfect for debugging
+- Auto-reload on code changes
+
+**View files in dev mode:**
+```bash
+# View a schedule
+cat /tmp/letta-switchboard-volume/schedules/recurring/abc123/uuid.json | jq
+
+# List all schedules
+ls -la /tmp/letta-switchboard-volume/schedules/
+```
+
+### Testing Your Instance
+
+Set environment variables:
+```bash
+export LETTA_API_KEY="sk-..."
+export LETTA_AGENT_ID="agent-xxx"
+export LETTA_SWITCHBOARD_URL="https://your-instance.modal.run"
+```
+
+Run tests:
+```bash
+# Python test suite
+python test_api.py
+
+# Bash test script
+./test_api.sh
+
+# Unit tests
+pytest -m "not e2e"
+
+# Full E2E tests (requires modal serve running)
+pytest
+```
+
+### Cost Estimate
+
+Running your own instance on Modal:
+- **Free tier:** ~$30/month of free credits
+- **API requests:** Free (minimal compute)
+- **Cron job:** Runs every minute (~43,000 times/month)
+- **Storage:** First 1GB free, then $0.10/GB/month
+- **Expected cost:** $0-5/month for personal use
+
+The hosted service at `letta--switchboard-api.modal.run` is free to use!
+
+---
 
 ## License
 
