@@ -238,6 +238,50 @@ def find_onetime_schedule_for_user(api_key: str, schedule_id: str) -> tuple[dict
     return None, None
 
 
+@web_app.get("/")
+async def root():
+    """Landing page with usage instructions."""
+    return {
+        "service": "Letta Switchboard",
+        "description": "Free hosted message routing service for Letta agents",
+        "version": "1.0.0",
+        "documentation": "https://github.com/cpfiffer/letta-switchboard",
+        "features": [
+            "Send messages immediately or scheduled for later",
+            "Recurring schedules with cron expressions",
+            "Secure API key isolation",
+            "Execution tracking with run IDs"
+        ],
+        "quick_start": {
+            "curl_example": {
+                "one_time": "curl -X POST https://letta--switchboard-api.modal.run/schedules/one-time -H 'Authorization: Bearer YOUR_LETTA_API_KEY' -H 'Content-Type: application/json' -d '{\"agent_id\": \"agent-xxx\", \"execute_at\": \"2025-11-13T09:00:00Z\", \"message\": \"Hello!\"}'",
+                "recurring": "curl -X POST https://letta--switchboard-api.modal.run/schedules/recurring -H 'Authorization: Bearer YOUR_LETTA_API_KEY' -H 'Content-Type: application/json' -d '{\"agent_id\": \"agent-xxx\", \"cron\": \"0 9 * * 1-5\", \"message\": \"Daily standup\"}'"
+            },
+            "cli": {
+                "install": "git clone https://github.com/cpfiffer/letta-switchboard.git && cd letta-switchboard/cli && go build -o letta-switchboard",
+                "configure": "./letta-switchboard config set-api-key YOUR_LETTA_API_KEY",
+                "send": "./letta-switchboard send --agent-id agent-xxx --message 'Hello!'",
+                "schedule": "./letta-switchboard send --agent-id agent-xxx --message 'Reminder' --execute-at 'tomorrow at 9am'",
+                "recurring": "./letta-switchboard recurring create --agent-id agent-xxx --message 'Daily standup' --cron 'every weekday'"
+            }
+        },
+        "endpoints": {
+            "POST /schedules/one-time": "Create a one-time schedule",
+            "POST /schedules/recurring": "Create a recurring schedule",
+            "GET /schedules/one-time": "List your one-time schedules",
+            "GET /schedules/recurring": "List your recurring schedules",
+            "GET /schedules/one-time/{id}": "Get specific one-time schedule",
+            "GET /schedules/recurring/{id}": "Get specific recurring schedule",
+            "DELETE /schedules/one-time/{id}": "Delete one-time schedule",
+            "DELETE /schedules/recurring/{id}": "Delete recurring schedule",
+            "GET /results": "List execution results",
+            "GET /results/{schedule_id}": "Get result for specific schedule"
+        },
+        "authentication": "All endpoints require 'Authorization: Bearer YOUR_LETTA_API_KEY' header",
+        "support": "https://github.com/cpfiffer/letta-switchboard/issues"
+    }
+
+
 @web_app.post("/schedules/recurring")
 async def create_recurring_schedule(schedule: RecurringScheduleCreate, credentials: HTTPAuthorizationCredentials = Security(security)):
     api_key = credentials.credentials
