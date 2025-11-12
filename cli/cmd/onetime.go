@@ -13,22 +13,30 @@ import (
 )
 
 var onetimeCmd = &cobra.Command{
-	Use:   "onetime",
-	Short: "Manage one-time schedules",
-	Long:  "Create, list, view, and delete one-time schedules for Letta agents",
+	Use:     "onetime",
+	Aliases: []string{"send", "message"},
+	Short:   "Send messages to agents",
+	Long:    "Send one-time messages to Letta agents immediately or scheduled for later",
 }
 
 var onetimeCreateCmd = &cobra.Command{
-	Use:   "create",
-	Short: "Create a new one-time schedule",
+	Use:     "create",
+	Aliases: []string{"send"},
+	Short:   "Send a message to an agent",
+	Long:    "Send a message to an agent immediately or scheduled for later",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		agentID, _ := cmd.Flags().GetString("agent-id")
 		message, _ := cmd.Flags().GetString("message")
 		role, _ := cmd.Flags().GetString("role")
 		executeAt, _ := cmd.Flags().GetString("execute-at")
 
-		if agentID == "" || message == "" || executeAt == "" {
-			return fmt.Errorf("agent-id, message, and execute-at are required")
+		if agentID == "" || message == "" {
+			return fmt.Errorf("agent-id and message are required")
+		}
+
+		// Default to "now" if no time specified
+		if executeAt == "" {
+			executeAt = "now"
 		}
 
 		// Parse natural language time to ISO 8601
@@ -56,7 +64,11 @@ var onetimeCreateCmd = &cobra.Command{
 			return fmt.Errorf("failed to create schedule: %w", err)
 		}
 
-		color.Green("✓ One-time schedule created successfully")
+		if executeAt == "now" {
+			color.Green("✓ Message sent successfully (executing immediately)")
+		} else {
+			color.Green("✓ Message scheduled successfully")
+		}
 		fmt.Printf("\nSchedule ID:  %s\n", schedule.ID)
 		fmt.Printf("Agent ID:     %s\n", schedule.AgentID)
 		fmt.Printf("Execute At:   %s\n", schedule.ExecuteAt)
@@ -181,7 +193,7 @@ func init() {
 	onetimeCreateCmd.Flags().String("agent-id", "", "Agent ID (required)")
 	onetimeCreateCmd.Flags().String("message", "", "Message to send (required)")
 	onetimeCreateCmd.Flags().String("role", "user", "Message role (default: user)")
-	onetimeCreateCmd.Flags().String("execute-at", "", "When to execute (required)\n  Examples: 'in 5 minutes', 'tomorrow at 9am', 'next monday at 3pm', '2025-11-07T10:00:00Z'")
+	onetimeCreateCmd.Flags().String("execute-at", "", "When to send (optional, defaults to now)\n  Examples: 'in 5 minutes', 'tomorrow at 9am', 'next monday at 3pm', '2025-11-07T10:00:00Z', or omit for immediate delivery")
 
 	onetimeCmd.AddCommand(onetimeListCmd)
 	onetimeCmd.AddCommand(onetimeGetCmd)

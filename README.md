@@ -159,9 +159,33 @@ Same functionality using curl commands.
 LETTA_API_KEY=sk-xxx LETTA_AGENT_ID=agent-yyy python test_api.py
 ```
 
+## CLI Usage (Recommended)
+
+The easiest way to interact with letta-schedules is via the CLI:
+
+```bash
+# Send a message immediately
+letta-schedules send --agent-id agent-xxx --message "Hello!"
+
+# Send a message later
+letta-schedules send --agent-id agent-xxx --message "Reminder" --execute-at "tomorrow at 9am"
+
+# Create recurring schedule
+letta-schedules recurring create --agent-id agent-xxx --message "Daily standup" --cron "every weekday at 9am"
+
+# List schedules
+letta-schedules onetime list
+letta-schedules recurring list
+
+# View results
+letta-schedules results list
+```
+
+See [CLI Documentation](cli/README.md) for installation and full usage guide.
+
 ## API Usage
 
-Base URL: `https://your-modal-app.modal.run`
+Base URL: `https://letta--schedules-api.modal.run`
 
 ### Authentication
 

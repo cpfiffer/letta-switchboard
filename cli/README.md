@@ -1,14 +1,15 @@
 # Letta Schedules CLI
 
-A command-line interface for managing scheduled messages for Letta AI agents.
+A command-line interface for sending messages to Letta AI agents and managing schedules.
 
 ## Features
 
-- Create and manage recurring schedules with cron expressions
-- Create and manage one-time schedules
-- View execution results
-- Beautiful table output
-- Easy configuration management
+- **Send messages to agents** - Immediately or scheduled for later
+- **Natural language scheduling** - "in 5 minutes", "tomorrow at 9am", "every weekday"
+- **Recurring schedules** - Daily check-ins, weekly summaries, custom patterns
+- **View execution results** - Track message delivery and run IDs
+- **Beautiful output** - Clean tables and colored success messages
+- **Easy configuration** - One-time API key setup
 
 ## Installation
 
@@ -61,18 +62,34 @@ letta-schedules config set-url https://your-api-url.com
 letta-schedules config show
 ```
 
-### 2. Create a Recurring Schedule
+### 2. Send a Message to an Agent
+
+```bash
+# Send immediately
+letta-schedules send \
+  --agent-id agent-xxx \
+  --message "Hello! How are you doing?"
+
+# Or schedule for later
+letta-schedules send \
+  --agent-id agent-xxx \
+  --message "Reminder: Follow up on project" \
+  --execute-at "tomorrow at 9am"
+```
+
+### 3. Create a Recurring Schedule
 
 ```bash
 letta-schedules recurring create \
   --agent-id agent-xxx \
   --message "Daily check-in" \
-  --cron "0 9 * * *"
+  --cron "every weekday at 9am"
 ```
 
-### 3. List Schedules
+### 4. List Schedules
 
 ```bash
+letta-schedules onetime list
 letta-schedules recurring list
 ```
 
@@ -198,6 +215,45 @@ letta-schedules results list
 # Get result for a specific schedule
 letta-schedules results get <schedule-id>
 ```
+
+## Sending Messages (One-Time Schedules)
+
+The `send` (alias: `onetime create`) command allows you to send messages to agents immediately or scheduled for later.
+
+### Send Immediately
+
+```bash
+# Send a message right now (executes within 1 minute)
+letta-schedules send \
+  --agent-id agent-xxx \
+  --message "Hey, how's the project going?"
+```
+
+### Schedule for Later
+
+```bash
+# Relative time
+letta-schedules send \
+  --agent-id agent-xxx \
+  --message "Follow up reminder" \
+  --execute-at "in 2 hours"
+
+# Specific day/time
+letta-schedules send \
+  --agent-id agent-xxx \
+  --message "Weekly summary time!" \
+  --execute-at "next monday at 10am"
+```
+
+### Future: Cross-Server Messaging
+
+**Coming soon:** Permission system to allow messaging agents across different Letta servers.
+
+This will enable:
+- Send messages to agents on any Letta instance (cloud or self-hosted)
+- Permission tables to control who can message which agents
+- Cross-organization agent communication
+- Federated agent networks
 
 ## Configuration
 
