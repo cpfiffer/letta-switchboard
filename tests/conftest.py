@@ -10,7 +10,7 @@ from cryptography.fernet import Fernet
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-os.environ["LETTA_SCHEDULES_DEV_MODE"] = "true"
+os.environ["LETTA_SWITCHBOARD_DEV_MODE"] = "true"
 
 
 @pytest.fixture
@@ -85,8 +85,8 @@ def past_onetime_schedule_data(mock_api_key, mock_agent_id):
 
 @pytest.fixture
 def api_base_url():
-    """Base URL for API testing. Override with LETTA_SCHEDULES_URL env var."""
-    return os.getenv("LETTA_SCHEDULES_URL", "https://letta--letta-schedules-api-dev.modal.run")
+    """Base URL for API testing. Override with LETTA_SWITCHBOARD_URL env var."""
+    return os.getenv("LETTA_SWITCHBOARD_URL", "https://letta--letta-switchboard-api-dev.modal.run")
 
 
 @pytest.fixture

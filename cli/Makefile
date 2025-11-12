@@ -5,23 +5,23 @@ all: build
 
 # Build for current platform
 build:
-	go build -o letta-schedules
+	go build -o letta-switchboard
 
 # Build for all platforms
 build-all:
-	GOOS=darwin GOARCH=amd64 go build -o dist/letta-schedules-darwin-amd64
-	GOOS=darwin GOARCH=arm64 go build -o dist/letta-schedules-darwin-arm64
-	GOOS=linux GOARCH=amd64 go build -o dist/letta-schedules-linux-amd64
-	GOOS=linux GOARCH=arm64 go build -o dist/letta-schedules-linux-arm64
-	GOOS=windows GOARCH=amd64 go build -o dist/letta-schedules-windows-amd64.exe
+	GOOS=darwin GOARCH=amd64 go build -o dist/letta-switchboard-darwin-amd64
+	GOOS=darwin GOARCH=arm64 go build -o dist/letta-switchboard-darwin-arm64
+	GOOS=linux GOARCH=amd64 go build -o dist/letta-switchboard-linux-amd64
+	GOOS=linux GOARCH=arm64 go build -o dist/letta-switchboard-linux-arm64
+	GOOS=windows GOARCH=amd64 go build -o dist/letta-switchboard-windows-amd64.exe
 
 # Install to /usr/local/bin
 install: build
-	sudo mv letta-schedules /usr/local/bin/
+	sudo mv letta-switchboard /usr/local/bin/
 
 # Clean build artifacts
 clean:
-	rm -f letta-schedules
+	rm -f letta-switchboard
 	rm -rf dist/
 
 # Download dependencies

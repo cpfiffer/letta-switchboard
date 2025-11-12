@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
-	"github.com/letta/letta-schedules-cli/internal/config"
+	"github.com/letta/letta-switchboard-cli/internal/config"
 	"github.com/spf13/cobra"
 )
 

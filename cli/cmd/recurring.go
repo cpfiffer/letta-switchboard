@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/fatih/color"
-	"github.com/letta/letta-schedules-cli/internal/client"
-	"github.com/letta/letta-schedules-cli/internal/config"
-	"github.com/letta/letta-schedules-cli/internal/parser"
+	"github.com/letta/letta-switchboard-cli/internal/client"
+	"github.com/letta/letta-switchboard-cli/internal/config"
+	"github.com/letta/letta-switchboard-cli/internal/parser"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 )

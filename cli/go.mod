@@ -1,4 +1,4 @@
-module github.com/letta/letta-schedules-cli
+module github.com/letta/letta-switchboard-cli
 
 go 1.21
 

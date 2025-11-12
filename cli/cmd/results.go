@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/letta/letta-schedules-cli/internal/client"
-	"github.com/letta/letta-schedules-cli/internal/config"
+	"github.com/letta/letta-switchboard-cli/internal/client"
+	"github.com/letta/letta-switchboard-cli/internal/config"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 )

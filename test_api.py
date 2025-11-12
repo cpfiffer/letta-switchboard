@@ -4,7 +4,7 @@ import os
 import json
 from datetime import datetime, timedelta, timezone
 
-BASE_URL = os.getenv("LETTA_SCHEDULES_URL", "https://letta--letta-schedules-api-dev.modal.run")
+BASE_URL = os.getenv("LETTA_SWITCHBOARD_URL", "https://letta--letta-switchboard-api-dev.modal.run")
 API_KEY = os.getenv("LETTA_API_KEY")
 AGENT_ID = os.getenv("LETTA_AGENT_ID", "agent-a29146cc-2fb3-452d-8c0c-bf71e5db609a")
 

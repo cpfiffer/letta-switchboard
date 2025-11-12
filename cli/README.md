@@ -1,4 +1,4 @@
-# Letta Schedules CLI
+# Letta Switchboard CLI
 
 A command-line interface for sending messages to Letta AI agents and managing schedules.
 
@@ -20,31 +20,31 @@ A command-line interface for sending messages to Letta AI agents and managing sc
 cd cli
 
 # Build the binary
-go build -o letta-schedules
+go build -o letta-switchboard
 
 # Move to your PATH (optional)
-sudo mv letta-schedules /usr/local/bin/
+sudo mv letta-switchboard /usr/local/bin/
 ```
 
 ### Using Go Install
 
 ```bash
-go install github.com/letta/letta-schedules-cli@latest
+go install github.com/letta/letta-switchboard-cli@latest
 ```
 
 ### Cross-Platform Build
 
 ```bash
 # macOS
-GOOS=darwin GOARCH=amd64 go build -o letta-schedules-darwin-amd64
-GOOS=darwin GOARCH=arm64 go build -o letta-schedules-darwin-arm64
+GOOS=darwin GOARCH=amd64 go build -o letta-switchboard-darwin-amd64
+GOOS=darwin GOARCH=arm64 go build -o letta-switchboard-darwin-arm64
 
 # Linux
-GOOS=linux GOARCH=amd64 go build -o letta-schedules-linux-amd64
-GOOS=linux GOARCH=arm64 go build -o letta-schedules-linux-arm64
+GOOS=linux GOARCH=amd64 go build -o letta-switchboard-linux-amd64
+GOOS=linux GOARCH=arm64 go build -o letta-switchboard-linux-arm64
 
 # Windows
-GOOS=windows GOARCH=amd64 go build -o letta-schedules-windows-amd64.exe
+GOOS=windows GOARCH=amd64 go build -o letta-switchboard-windows-amd64.exe
 ```
 
 ## Quick Start
@@ -53,25 +53,25 @@ GOOS=windows GOARCH=amd64 go build -o letta-schedules-windows-amd64.exe
 
 ```bash
 # Set your Letta API key
-letta-schedules config set-api-key sk-xxx...
+letta-switchboard config set-api-key sk-xxx...
 
 # Set the API URL (optional, defaults to Modal deployment)
-letta-schedules config set-url https://your-api-url.com
+letta-switchboard config set-url https://your-api-url.com
 
 # View current configuration
-letta-schedules config show
+letta-switchboard config show
 ```
 
 ### 2. Send a Message to an Agent
 
 ```bash
 # Send immediately
-letta-schedules send \
+letta-switchboard send \
   --agent-id agent-xxx \
   --message "Hello! How are you doing?"
 
 # Or schedule for later
-letta-schedules send \
+letta-switchboard send \
   --agent-id agent-xxx \
   --message "Reminder: Follow up on project" \
   --execute-at "tomorrow at 9am"
@@ -80,7 +80,7 @@ letta-schedules send \
 ### 3. Create a Recurring Schedule
 
 ```bash
-letta-schedules recurring create \
+letta-switchboard recurring create \
   --agent-id agent-xxx \
   --message "Daily check-in" \
   --cron "every weekday at 9am"
@@ -89,8 +89,8 @@ letta-schedules recurring create \
 ### 4. List Schedules
 
 ```bash
-letta-schedules onetime list
-letta-schedules recurring list
+letta-switchboard onetime list
+letta-switchboard recurring list
 ```
 
 ## Natural Language Support
@@ -150,33 +150,33 @@ The CLI supports natural language input for both time expressions and cron sched
 
 ```bash
 # Set API key
-letta-schedules config set-api-key <key>
+letta-switchboard config set-api-key <key>
 
 # Set base URL
-letta-schedules config set-url <url>
+letta-switchboard config set-url <url>
 
 # Show configuration
-letta-schedules config show
+letta-switchboard config show
 ```
 
 ### Recurring Schedules
 
 ```bash
 # Create a recurring schedule
-letta-schedules recurring create \
+letta-switchboard recurring create \
   --agent-id <agent-id> \
   --message "Your message" \
   --cron "0 9 * * *" \
   --role user
 
 # List all recurring schedules
-letta-schedules recurring list
+letta-switchboard recurring list
 
 # Get details of a specific schedule
-letta-schedules recurring get <schedule-id>
+letta-switchboard recurring get <schedule-id>
 
 # Delete a schedule
-letta-schedules recurring delete <schedule-id>
+letta-switchboard recurring delete <schedule-id>
 ```
 
 #### Cron Expression Examples
@@ -190,30 +190,30 @@ letta-schedules recurring delete <schedule-id>
 
 ```bash
 # Create a one-time schedule
-letta-schedules onetime create \
+letta-switchboard onetime create \
   --agent-id <agent-id> \
   --message "Reminder message" \
   --execute-at "2025-11-07T10:00:00Z" \
   --role user
 
 # List all one-time schedules
-letta-schedules onetime list
+letta-switchboard onetime list
 
 # Get details of a specific schedule
-letta-schedules onetime get <schedule-id>
+letta-switchboard onetime get <schedule-id>
 
 # Delete a schedule
-letta-schedules onetime delete <schedule-id>
+letta-switchboard onetime delete <schedule-id>
 ```
 
 ### Execution Results
 
 ```bash
 # List all execution results
-letta-schedules results list
+letta-switchboard results list
 
 # Get result for a specific schedule
-letta-schedules results get <schedule-id>
+letta-switchboard results get <schedule-id>
 ```
 
 ## Sending Messages (One-Time Schedules)
@@ -224,7 +224,7 @@ The `send` (alias: `onetime create`) command allows you to send messages to agen
 
 ```bash
 # Send a message right now (executes within 1 minute)
-letta-schedules send \
+letta-switchboard send \
   --agent-id agent-xxx \
   --message "Hey, how's the project going?"
 ```
@@ -233,13 +233,13 @@ letta-schedules send \
 
 ```bash
 # Relative time
-letta-schedules send \
+letta-switchboard send \
   --agent-id agent-xxx \
   --message "Follow up reminder" \
   --execute-at "in 2 hours"
 
 # Specific day/time
-letta-schedules send \
+letta-switchboard send \
   --agent-id agent-xxx \
   --message "Weekly summary time!" \
   --execute-at "next monday at 10am"
@@ -257,7 +257,7 @@ This will enable:
 
 ## Configuration
 
-The CLI stores configuration in `~/.letta-schedules/config.yaml`:
+The CLI stores configuration in `~/.letta-switchboard/config.yaml`:
 
 ```yaml
 api_key: sk-xxx...
@@ -269,7 +269,7 @@ base_url: https://letta--schedules-api.modal.run
 ### Daily Agent Check-in
 
 ```bash
-letta-schedules recurring create \
+letta-switchboard recurring create \
   --agent-id agent-123 \
   --message "Good morning! Please provide a daily summary." \
   --cron "0 9 * * *"
@@ -278,7 +278,7 @@ letta-schedules recurring create \
 ### Hourly Status Update
 
 ```bash
-letta-schedules recurring create \
+letta-switchboard recurring create \
   --agent-id agent-123 \
   --message "Status update please" \
   --cron "0 * * * *"
@@ -287,7 +287,7 @@ letta-schedules recurring create \
 ### One-Time Reminder
 
 ```bash
-letta-schedules onetime create \
+letta-switchboard onetime create \
   --agent-id agent-123 \
   --message "Meeting in 1 hour" \
   --execute-at "2025-11-07T14:00:00Z"
@@ -302,7 +302,7 @@ letta-schedules onetime create \
 ### Build
 
 ```bash
-go build -o letta-schedules
+go build -o letta-switchboard
 ```
 
 ### Run Tests

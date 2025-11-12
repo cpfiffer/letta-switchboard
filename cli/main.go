@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/letta/letta-schedules-cli/cmd"
+	"github.com/letta/letta-switchboard-cli/cmd"
 )
 
 func main() {

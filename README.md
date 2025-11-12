@@ -1,4 +1,4 @@
-# Letta Schedules
+# Letta Switchboard
 
 A serverless scheduling service for Letta agents built on Modal. Schedule recurring (cron-based) or one-time messages to be sent to your Letta agents at specified times.
 
@@ -22,7 +22,7 @@ A serverless scheduling service for Letta agents built on Modal. Schedule recurr
 
 1. Clone the repository:
 ```bash
-cd letta-schedules
+cd letta-switchboard
 ```
 
 2. Install Modal CLI:
@@ -60,7 +60,7 @@ ENCRYPTION_KEY=$(python -c "from cryptography.fernet import Fernet; print(Fernet
 echo "Your encryption key: $ENCRYPTION_KEY"
 
 # Create Modal secret
-modal secret create letta-schedules-encryption \
+modal secret create letta-switchboard-encryption \
   LETTA_SCHEDULES_ENCRYPTION_KEY="$ENCRYPTION_KEY"
 ```
 
@@ -83,7 +83,7 @@ This will:
 modal app list
 ```
 
-Look for `letta-schedules` and note the API endpoint URL.
+Look for `letta-switchboard` and note the API endpoint URL.
 
 ## Local Development
 
@@ -109,13 +109,13 @@ This starts a local development server with auto-reload on file changes.
 **Inspecting files in dev mode:**
 ```bash
 # View a schedule
-cat /tmp/letta-schedules-volume/schedules/recurring/abc123/uuid.json | jq
+cat /tmp/letta-switchboard-volume/schedules/recurring/abc123/uuid.json | jq
 
 # View an execution result
-cat /tmp/letta-schedules-volume/results/abc123/uuid.json | jq
+cat /tmp/letta-switchboard-volume/results/abc123/uuid.json | jq
 
 # List all schedules for a user
-ls -la /tmp/letta-schedules-volume/schedules/recurring/abc123/
+ls -la /tmp/letta-switchboard-volume/schedules/recurring/abc123/
 ```
 
 ## Testing
@@ -161,24 +161,24 @@ LETTA_API_KEY=sk-xxx LETTA_AGENT_ID=agent-yyy python test_api.py
 
 ## CLI Usage (Recommended)
 
-The easiest way to interact with letta-schedules is via the CLI:
+The easiest way to interact with letta-switchboard is via the CLI:
 
 ```bash
 # Send a message immediately
-letta-schedules send --agent-id agent-xxx --message "Hello!"
+letta-switchboard send --agent-id agent-xxx --message "Hello!"
 
 # Send a message later
-letta-schedules send --agent-id agent-xxx --message "Reminder" --execute-at "tomorrow at 9am"
+letta-switchboard send --agent-id agent-xxx --message "Reminder" --execute-at "tomorrow at 9am"
 
 # Create recurring schedule
-letta-schedules recurring create --agent-id agent-xxx --message "Daily standup" --cron "every weekday at 9am"
+letta-switchboard recurring create --agent-id agent-xxx --message "Daily standup" --cron "every weekday at 9am"
 
 # List schedules
-letta-schedules onetime list
-letta-schedules recurring list
+letta-switchboard onetime list
+letta-switchboard recurring list
 
 # View results
-letta-schedules results list
+letta-switchboard results list
 ```
 
 See [CLI Documentation](cli/README.md) for installation and full usage guide.
@@ -417,12 +417,12 @@ Schedules and execution results are stored in a hash-based directory structure:
 
 View logs in Modal dashboard:
 ```bash
-modal app logs letta-schedules
+modal app logs letta-switchboard
 ```
 
 Or watch logs in real-time:
 ```bash
-modal app logs letta-schedules --follow
+modal app logs letta-switchboard --follow
 ```
 
 ## Limitations

@@ -34,28 +34,28 @@ class TestApiKeyHash:
 class TestDevMode:
     def test_dev_mode_true(self):
         """Dev mode should be enabled when env var is 'true'."""
-        os.environ["LETTA_SCHEDULES_DEV_MODE"] = "true"
+        os.environ["LETTA_SWITCHBOARD_DEV_MODE"] = "true"
         assert is_dev_mode() is True
     
     def test_dev_mode_1(self):
         """Dev mode should be enabled when env var is '1'."""
-        os.environ["LETTA_SCHEDULES_DEV_MODE"] = "1"
+        os.environ["LETTA_SWITCHBOARD_DEV_MODE"] = "1"
         assert is_dev_mode() is True
     
     def test_dev_mode_yes(self):
         """Dev mode should be enabled when env var is 'yes'."""
-        os.environ["LETTA_SCHEDULES_DEV_MODE"] = "yes"
+        os.environ["LETTA_SWITCHBOARD_DEV_MODE"] = "yes"
         assert is_dev_mode() is True
     
     def test_dev_mode_false(self):
         """Dev mode should be disabled when env var is 'false'."""
-        os.environ["LETTA_SCHEDULES_DEV_MODE"] = "false"
+        os.environ["LETTA_SWITCHBOARD_DEV_MODE"] = "false"
         assert is_dev_mode() is False
     
     def test_dev_mode_unset(self):
         """Dev mode should be disabled when env var is not set."""
-        if "LETTA_SCHEDULES_DEV_MODE" in os.environ:
-            del os.environ["LETTA_SCHEDULES_DEV_MODE"]
+        if "LETTA_SWITCHBOARD_DEV_MODE" in os.environ:
+            del os.environ["LETTA_SWITCHBOARD_DEV_MODE"]
         assert is_dev_mode() is False
 
 
@@ -81,7 +81,7 @@ class TestEncryption:
     
     def test_dev_mode_plaintext(self):
         """In dev mode, data should be plaintext JSON."""
-        os.environ["LETTA_SCHEDULES_DEV_MODE"] = "true"
+        os.environ["LETTA_SWITCHBOARD_DEV_MODE"] = "true"
         
         data = {"test": "data", "number": 123}
         key = b"ignored-in-dev-mode"
@@ -96,7 +96,7 @@ class TestEncryption:
     
     def test_dev_mode_decrypt(self):
         """In dev mode, decrypt should parse plaintext JSON."""
-        os.environ["LETTA_SCHEDULES_DEV_MODE"] = "true"
+        os.environ["LETTA_SWITCHBOARD_DEV_MODE"] = "true"
         
         data = {"test": "data"}
         key = b"ignored"
@@ -108,7 +108,7 @@ class TestEncryption:
     
     def test_production_mode_encrypted(self):
         """In production mode, data should be encrypted (not plaintext)."""
-        os.environ["LETTA_SCHEDULES_DEV_MODE"] = "false"
+        os.environ["LETTA_SWITCHBOARD_DEV_MODE"] = "false"
         
         data = {"test": "secret"}
         key = Fernet.generate_key()
@@ -122,7 +122,7 @@ class TestEncryption:
     
     def test_wrong_key_fails(self, encryption_key):
         """Decrypting with wrong key should fail."""
-        os.environ["LETTA_SCHEDULES_DEV_MODE"] = "false"
+        os.environ["LETTA_SWITCHBOARD_DEV_MODE"] = "false"
         
         data = {"test": "data"}
         encrypted = encrypt_json(data, encryption_key)

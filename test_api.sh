@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASE_URL="${LETTA_SCHEDULES_URL:-https://your-modal-app-url.modal.run}"
+BASE_URL="${LETTA_SWITCHBOARD_URL:-https://your-modal-app-url.modal.run}"
 AGENT_ID="${LETTA_AGENT_ID:-your-agent-id}"
 API_KEY="${LETTA_API_KEY}"
 

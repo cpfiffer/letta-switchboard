@@ -26,17 +26,17 @@ fi
 echo "Generated encryption key: ${ENCRYPTION_KEY:0:20}..."
 echo ""
 
-echo "Creating Modal secret 'letta-schedules-encryption'..."
+echo "Creating Modal secret 'letta-switchboard-encryption'..."
 
 # Check if secret already exists
-if modal secret list | grep -q "letta-schedules-encryption"; then
-    echo "WARNING: Secret 'letta-schedules-encryption' already exists."
-    echo "Delete it first with: modal secret delete letta-schedules-encryption"
+if modal secret list | grep -q "letta-switchboard-encryption"; then
+    echo "WARNING: Secret 'letta-switchboard-encryption' already exists."
+    echo "Delete it first with: modal secret delete letta-switchboard-encryption"
     exit 1
 fi
 
 # Create the secret
-modal secret create letta-schedules-encryption LETTA_SCHEDULES_ENCRYPTION_KEY="$ENCRYPTION_KEY" 2>&1
+modal secret create letta-switchboard-encryption LETTA_SWITCHBOARD_ENCRYPTION_KEY="$ENCRYPTION_KEY" 2>&1
 
 if [ $? -eq 0 ]; then
     echo ""

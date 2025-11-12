@@ -14,19 +14,19 @@ def get_api_key_hash(api_key: str) -> str:
 
 def is_dev_mode() -> bool:
     """Check if we're in dev mode (no encryption)."""
-    return os.getenv("LETTA_SCHEDULES_DEV_MODE", "").lower() in ("true", "1", "yes")
+    return os.getenv("LETTA_SWITCHBOARD_DEV_MODE", "").lower() in ("true", "1", "yes")
 
 
 def get_encryption_key() -> bytes:
     """Get or generate encryption key for JSON encryption."""
-    key = os.getenv("LETTA_SCHEDULES_ENCRYPTION_KEY")
+    key = os.getenv("LETTA_SWITCHBOARD_ENCRYPTION_KEY")
     
     if is_dev_mode():
         logger.warning("🔓 DEV MODE: Encryption disabled - files stored in plaintext")
         return b"dev-mode-no-encryption"
     
     if not key:
-        logger.warning("LETTA_SCHEDULES_ENCRYPTION_KEY not set, generating temporary key")
+        logger.warning("LETTA_SWITCHBOARD_ENCRYPTION_KEY not set, generating temporary key")
         key = Fernet.generate_key().decode()
     
     return key.encode()

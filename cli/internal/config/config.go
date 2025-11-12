@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	ConfigDirName  = ".letta-schedules"
+	ConfigDirName  = ".letta-switchboard"
 	ConfigFileName = "config"
 )
 
@@ -45,7 +45,7 @@ func InitConfig() error {
 	viper.AddConfigPath(configDir)
 
 	// Set defaults
-	viper.SetDefault("base_url", "https://letta--schedules-api.modal.run")
+	viper.SetDefault("base_url", "https://letta--switchboard-api.modal.run")
 
 	// Read config file if it exists
 	if err := viper.ReadInConfig(); err != nil {
@@ -96,10 +96,10 @@ func saveConfig() error {
 // Validate checks if the configuration is valid
 func (c *Config) Validate() error {
 	if c.APIKey == "" {
-		return fmt.Errorf("API key not set. Run 'letta-schedules config set-api-key <key>'")
+		return fmt.Errorf("API key not set. Run 'letta-switchboard config set-api-key <key>'")
 	}
 	if c.BaseURL == "" {
-		return fmt.Errorf("base URL not set. Run 'letta-schedules config set-url <url>'")
+		return fmt.Errorf("base URL not set. Run 'letta-switchboard config set-url <url>'")
 	}
 	return nil
 }

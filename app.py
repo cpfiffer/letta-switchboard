@@ -25,26 +25,26 @@ from dateutil import parser as date_parser
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = modal.App("schedules")
+app = modal.App("switchboard")
 
 import os as local_os
 
 # Read dev mode setting from local environment
-dev_mode_enabled = local_os.getenv("LETTA_SCHEDULES_DEV_MODE", "false")
+dev_mode_enabled = local_os.getenv("LETTA_SWITCHBOARD_DEV_MODE", "false")
 
 image = (
     modal.Image.debian_slim()
     .pip_install_from_requirements("requirements.txt")
-    .env({"LETTA_SCHEDULES_DEV_MODE": dev_mode_enabled})  # Must come before add_local_*
+    .env({"LETTA_SWITCHBOARD_DEV_MODE": dev_mode_enabled})  # Must come before add_local_*
     .add_local_python_source("models", "scheduler", "letta_executor", "crypto_utils")
 )
 
-volume = modal.Volume.from_name("letta-schedules-volume", create_if_missing=True)
+volume = modal.Volume.from_name("letta-switchboard-volume", create_if_missing=True)
 
 try:
-    encryption_secret = modal.Secret.from_name("letta-schedules-encryption")
+    encryption_secret = modal.Secret.from_name("letta-switchboard-encryption")
 except Exception:
-    logger.warning("letta-schedules-encryption secret not found, will use env var or generate temporary key")
+    logger.warning("letta-switchboard-encryption secret not found, will use env var or generate temporary key")
     encryption_secret = None
 
 VOLUME_PATH = "/data"

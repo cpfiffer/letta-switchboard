@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/letta/letta-schedules-cli/internal/config"
+	"github.com/letta/letta-switchboard-cli/internal/config"
 	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "letta-schedules",
-	Short: "CLI for managing Letta scheduled messages",
-	Long: `A command-line interface for managing scheduled messages
-for Letta AI agents. Create recurring and one-time schedules,
-and view execution results.`,
+	Use:   "letta-switchboard",
+	Short: "CLI for routing messages to Letta agents",
+	Long: `Letta Switchboard - Route messages to Letta AI agents
+Send messages immediately or schedule for later. Create recurring
+schedules and view execution results.`,
 }
 
 // Execute runs the root command
