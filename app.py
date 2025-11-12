@@ -4,9 +4,9 @@ import logging
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List
-from fastapi import FastAPI, HTTPException, Header, Security
+from fastapi import FastAPI, HTTPException, Header, Security, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from typing import Optional
 
 security = HTTPBearer()
@@ -239,9 +239,14 @@ def find_onetime_schedule_for_user(api_key: str, schedule_id: str) -> tuple[dict
 
 
 @web_app.get("/")
-async def root():
+async def root(request: Request):
     """Landing page with usage instructions."""
-    return {
+    
+    # Check if browser is requesting HTML
+    accept_header = request.headers.get("accept", "")
+    wants_html = "text/html" in accept_header
+    
+    info = {
         "service": "Letta Switchboard",
         "description": "Free hosted message routing service for Letta agents",
         "version": "1.0.0",
@@ -280,6 +285,149 @@ async def root():
         "authentication": "All endpoints require 'Authorization: Bearer YOUR_LETTA_API_KEY' header",
         "support": "https://github.com/cpfiffer/letta-switchboard/issues"
     }
+    
+    if wants_html:
+        html_content = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Letta Switchboard</title>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    color: #333;
+                }
+                h1 { color: #2563eb; margin-bottom: 0; }
+                h2 { color: #1e40af; margin-top: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
+                .subtitle { color: #6b7280; margin-top: 8px; font-size: 1.1em; }
+                .feature-list { list-style: none; padding: 0; }
+                .feature-list li:before { content: "✓ "; color: #10b981; font-weight: bold; }
+                code {
+                    background: #f3f4f6;
+                    padding: 2px 6px;
+                    border-radius: 3px;
+                    font-size: 0.9em;
+                }
+                pre {
+                    background: #1f2937;
+                    color: #f3f4f6;
+                    padding: 16px;
+                    border-radius: 6px;
+                    overflow-x: auto;
+                }
+                .example { margin: 20px 0; }
+                .endpoint {
+                    background: #f9fafb;
+                    padding: 12px;
+                    margin: 8px 0;
+                    border-radius: 4px;
+                    border-left: 3px solid #2563eb;
+                }
+                .endpoint code { background: white; }
+                a { color: #2563eb; text-decoration: none; }
+                a:hover { text-decoration: underline; }
+                .note {
+                    background: #fef3c7;
+                    border-left: 3px solid #f59e0b;
+                    padding: 12px;
+                    margin: 16px 0;
+                    border-radius: 4px;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>🔀 Letta Switchboard</h1>
+            <p class="subtitle">Free hosted message routing service for Letta agents</p>
+            
+            <h2>Features</h2>
+            <ul class="feature-list">
+                <li>Send messages immediately or scheduled for later</li>
+                <li>Recurring schedules with cron expressions</li>
+                <li>Secure API key isolation</li>
+                <li>Execution tracking with run IDs</li>
+            </ul>
+            
+            <h2>Quick Start with cURL</h2>
+            
+            <div class="example">
+                <h3>Send a one-time message:</h3>
+                <pre>curl -X POST https://letta--switchboard-api.modal.run/schedules/one-time \\
+  -H 'Authorization: Bearer YOUR_LETTA_API_KEY' \\
+  -H 'Content-Type: application/json' \\
+  -d '{
+    "agent_id": "agent-xxx",
+    "execute_at": "2025-11-13T09:00:00Z",
+    "message": "Hello from Switchboard!"
+  }'</pre>
+            </div>
+            
+            <div class="example">
+                <h3>Create recurring schedule (weekdays at 9am):</h3>
+                <pre>curl -X POST https://letta--switchboard-api.modal.run/schedules/recurring \\
+  -H 'Authorization: Bearer YOUR_LETTA_API_KEY' \\
+  -H 'Content-Type: application/json' \\
+  -d '{
+    "agent_id": "agent-xxx",
+    "cron": "0 9 * * 1-5",
+    "message": "Daily standup reminder"
+  }'</pre>
+            </div>
+            
+            <h2>CLI (Natural Language Support)</h2>
+            <p>The CLI supports natural language for easier scheduling:</p>
+            
+            <div class="example">
+                <h3>Installation:</h3>
+                <pre>git clone https://github.com/cpfiffer/letta-switchboard.git
+cd letta-switchboard/cli
+go build -o letta-switchboard
+./letta-switchboard config set-api-key YOUR_LETTA_API_KEY</pre>
+            </div>
+            
+            <div class="example">
+                <h3>Usage:</h3>
+                <pre># Send immediately
+./letta-switchboard send --agent-id agent-xxx --message "Hello!"
+
+# Schedule with natural language
+./letta-switchboard send --agent-id agent-xxx --message "Reminder" --execute-at "tomorrow at 9am"
+
+# Recurring schedule
+./letta-switchboard recurring create --agent-id agent-xxx --message "Daily standup" --cron "every weekday"</pre>
+            </div>
+            
+            <h2>Available Endpoints</h2>
+            <div class="endpoint"><code>POST /schedules/one-time</code> - Create a one-time schedule</div>
+            <div class="endpoint"><code>POST /schedules/recurring</code> - Create a recurring schedule</div>
+            <div class="endpoint"><code>GET /schedules/one-time</code> - List your one-time schedules</div>
+            <div class="endpoint"><code>GET /schedules/recurring</code> - List your recurring schedules</div>
+            <div class="endpoint"><code>GET /schedules/one-time/{id}</code> - Get specific one-time schedule</div>
+            <div class="endpoint"><code>GET /schedules/recurring/{id}</code> - Get specific recurring schedule</div>
+            <div class="endpoint"><code>DELETE /schedules/one-time/{id}</code> - Delete one-time schedule</div>
+            <div class="endpoint"><code>DELETE /schedules/recurring/{id}</code> - Delete recurring schedule</div>
+            <div class="endpoint"><code>GET /results</code> - List execution results</div>
+            <div class="endpoint"><code>GET /results/{schedule_id}</code> - Get result for specific schedule</div>
+            
+            <div class="note">
+                <strong>Authentication:</strong> All endpoints require <code>Authorization: Bearer YOUR_LETTA_API_KEY</code> header
+            </div>
+            
+            <h2>Documentation & Support</h2>
+            <p>📖 Full documentation: <a href="https://github.com/cpfiffer/letta-switchboard">github.com/cpfiffer/letta-switchboard</a></p>
+            <p>🐛 Issues & support: <a href="https://github.com/cpfiffer/letta-switchboard/issues">GitHub Issues</a></p>
+            <p>💬 API response: <a href="/?json">View as JSON</a></p>
+        </body>
+        </html>
+        """
+        return HTMLResponse(content=html_content)
+    
+    return info
 
 
 @web_app.post("/schedules/recurring")
