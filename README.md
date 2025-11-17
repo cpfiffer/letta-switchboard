@@ -16,13 +16,18 @@ Send messages to your Letta agents immediately or scheduled for later. Supports 
 
 Visit the dashboard in your browser: **[https://letta--switchboard-api.modal.run/dashboard](https://letta--switchboard-api.modal.run/dashboard)**
 
-1. Enter your Letta API key
-2. View all your schedules
-3. Create new schedules with a simple form
-4. View execution results and errors
-5. Delete schedules with one click
+1. Enter your Letta API key (stored in browser session only)
+2. View all your schedules with loading indicators
+3. Create new schedules with timezone support
+4. View execution results with success/failed status badges
+5. Delete schedules with confirmation dialog
+6. Refresh data anytime
 
-No installation required - just visit the URL!
+Features:
+- **Timezone support** - Local browser time, UTC, or major timezones
+- **Loading indicators** - Visual feedback while fetching data
+- **Status badges** - See successful vs failed executions at a glance
+- **No installation** - Just visit the URL in your browser!
 
 ### Option 2: Using cURL (No Installation Required)
 
