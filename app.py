@@ -302,7 +302,7 @@ async def root(request: Request):
                     margin: 0;
                     padding: 15px;
                     line-height: 1.5;
-                    font-weight: normal;
+                    font-weight: 500;
                 }
                 .container {
                     max-width: 900px;
@@ -342,7 +342,7 @@ async def root(request: Request):
                     font-size: 13px;
                     line-height: 1.6;
                     margin: 0;
-                    font-weight: normal;
+                    font-weight: 500;
                 }
                 .feature-list {
                     list-style: none;
@@ -351,7 +351,7 @@ async def root(request: Request):
                 }
                 .feature-list li {
                     padding: 4px 0;
-                    font-weight: normal;
+                    font-weight: 500;
                 }
                 .feature-list li:before {
                     content: "▪ ";
@@ -362,7 +362,7 @@ async def root(request: Request):
                     background: #f0f0f0;
                     padding: 2px 6px;
                     border: 1px solid #000;
-                    font-weight: normal;
+                    font-weight: 500;
                 }
                 pre {
                     background: #fafafa;
@@ -370,14 +370,14 @@ async def root(request: Request):
                     padding: 12px;
                     overflow-x: auto;
                     margin: 10px 0;
-                    font-weight: normal;
+                    font-weight: 500;
                 }
                 .endpoint {
                     background: #fafafa;
                     padding: 8px 12px;
                     margin: 6px 0;
                     border: 2px solid #000;
-                    font-weight: normal;
+                    font-weight: 500;
                 }
                 a {
                     color: #000;
@@ -393,7 +393,24 @@ async def root(request: Request):
                     border: 2px solid #000;
                     padding: 12px;
                     margin: 15px 0;
-                    font-weight: normal;
+                    font-weight: 500;
+                }
+                .dashboard-link {
+                    display: block;
+                    background: #000;
+                    color: white;
+                    padding: 15px;
+                    text-align: center;
+                    text-decoration: none;
+                    font-weight: bold;
+                    font-size: 16px;
+                    letter-spacing: 2px;
+                    margin: 20px 0;
+                    border: 3px solid #000;
+                }
+                .dashboard-link:hover {
+                    background: white;
+                    color: #000;
                 }
             </style>
         </head>
@@ -406,6 +423,8 @@ VERSION:  1.0.0
 STATUS:   OPERATIONAL
 HOSTING:  FREE SERVERLESS DEPLOYMENT</pre>
             </div>
+            
+            <a href="/dashboard" class="dashboard-link">→ OPEN WEB DASHBOARD ←</a>
             
             <h2>FEATURES</h2>
             <ul class="feature-list">
