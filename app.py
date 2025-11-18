@@ -297,67 +297,128 @@ async def root(request: Request):
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
                 body {
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                    max-width: 800px;
-                    margin: 40px auto;
-                    padding: 20px;
-                    line-height: 1.6;
-                    color: #333;
+                    font-family: 'Courier New', 'Consolas', monospace;
+                    background: #f5f5dc;
+                    margin: 0;
+                    padding: 15px;
+                    line-height: 1.4;
+                    font-weight: 600;
                 }
-                h1 { color: #2563eb; margin-bottom: 0; }
-                h2 { color: #1e40af; margin-top: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
-                .subtitle { color: #6b7280; margin-top: 8px; font-size: 1.1em; }
-                .feature-list { list-style: none; padding: 0; }
-                .feature-list li:before { content: "✓ "; color: #10b981; font-weight: bold; }
+                .container {
+                    max-width: 900px;
+                    margin: 0 auto;
+                    background: white;
+                    padding: 30px;
+                    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+                }
+                h1 {
+                    color: #000;
+                    margin-bottom: 8px;
+                    font-size: 24px;
+                    letter-spacing: 3px;
+                    font-weight: 900;
+                    text-transform: uppercase;
+                    border-bottom: 3px solid #000;
+                    padding-bottom: 8px;
+                }
+                h2 {
+                    color: #000;
+                    margin: 20px 0 10px;
+                    font-size: 16px;
+                    letter-spacing: 2px;
+                    font-weight: 900;
+                    text-transform: uppercase;
+                    border-bottom: 3px solid #000;
+                    padding-bottom: 3px;
+                }
+                .info-box {
+                    border: 3px solid #000;
+                    padding: 12px;
+                    margin: 15px 0;
+                    background: #fafafa;
+                }
+                .info-box pre {
+                    font-family: 'Courier New', monospace;
+                    font-size: 13px;
+                    line-height: 1.6;
+                    margin: 0;
+                    font-weight: 700;
+                }
+                .feature-list {
+                    list-style: none;
+                    padding: 0;
+                    margin: 10px 0;
+                }
+                .feature-list li {
+                    padding: 4px 0;
+                    font-weight: 600;
+                }
+                .feature-list li:before {
+                    content: "▪ ";
+                    color: #000;
+                    font-weight: 900;
+                }
                 code {
-                    background: #f3f4f6;
+                    background: #f0f0f0;
                     padding: 2px 6px;
-                    border-radius: 3px;
-                    font-size: 0.9em;
+                    border: 1px solid #000;
+                    font-weight: 700;
                 }
                 pre {
-                    background: #1f2937;
-                    color: #f3f4f6;
-                    padding: 16px;
-                    border-radius: 6px;
+                    background: #fafafa;
+                    border: 2px solid #000;
+                    padding: 12px;
                     overflow-x: auto;
+                    margin: 10px 0;
+                    font-weight: 600;
                 }
-                .example { margin: 20px 0; }
                 .endpoint {
-                    background: #f9fafb;
-                    padding: 12px;
-                    margin: 8px 0;
-                    border-radius: 4px;
-                    border-left: 3px solid #2563eb;
+                    background: #fafafa;
+                    padding: 8px 12px;
+                    margin: 6px 0;
+                    border: 2px solid #000;
+                    font-weight: 700;
                 }
-                .endpoint code { background: white; }
-                a { color: #2563eb; text-decoration: none; }
-                a:hover { text-decoration: underline; }
+                a {
+                    color: #000;
+                    text-decoration: underline;
+                    font-weight: 900;
+                }
+                a:hover {
+                    background: #000;
+                    color: white;
+                }
                 .note {
-                    background: #fef3c7;
-                    border-left: 3px solid #f59e0b;
+                    background: #fafafa;
+                    border: 3px solid #000;
                     padding: 12px;
-                    margin: 16px 0;
-                    border-radius: 4px;
+                    margin: 15px 0;
+                    font-weight: 700;
                 }
             </style>
         </head>
         <body>
-            <h1>🔀 Letta Switchboard</h1>
-            <p class="subtitle">Free hosted message routing service for Letta agents</p>
+            <div class="container">
+            <h1>LETTA SWITCHBOARD</h1>
+            <div class="info-box">
+                <pre>SERVICE:  MESSAGE ROUTING FOR LETTA AGENTS
+VERSION:  1.0.0
+STATUS:   OPERATIONAL
+HOSTING:  FREE SERVERLESS DEPLOYMENT</pre>
+            </div>
             
-            <h2>Features</h2>
+            <h2>FEATURES</h2>
             <ul class="feature-list">
-                <li>Send messages immediately or scheduled for later</li>
-                <li>Recurring schedules with cron expressions</li>
-                <li>Secure API key isolation</li>
-                <li>Execution tracking with run IDs</li>
+                <li>IMMEDIATE OR SCHEDULED MESSAGE DELIVERY</li>
+                <li>RECURRING SCHEDULES WITH CRON EXPRESSIONS</li>
+                <li>SECURE API KEY ISOLATION</li>
+                <li>EXECUTION TRACKING WITH RUN IDS</li>
             </ul>
             
-            <h2>Quick Start with cURL</h2>
+            <h2>QUICK START</h2>
             
             <div class="example">
-                <h3>Send a one-time message:</h3>
+                <p style="font-weight:900;margin:10px 0 6px 0;">SEND ONE-TIME MESSAGE:</p>
                 <pre>curl -X POST https://letta--switchboard-api.modal.run/schedules/one-time \\
   -H 'Authorization: Bearer YOUR_LETTA_API_KEY' \\
   -H 'Content-Type: application/json' \\
@@ -369,7 +430,7 @@ async def root(request: Request):
             </div>
             
             <div class="example">
-                <h3>Create recurring schedule (weekdays at 9am):</h3>
+                <p style="font-weight:900;margin:10px 0 6px 0;">CREATE RECURRING SCHEDULE:</p>
                 <pre>curl -X POST https://letta--switchboard-api.modal.run/schedules/recurring \\
   -H 'Authorization: Bearer YOUR_LETTA_API_KEY' \\
   -H 'Content-Type: application/json' \\
@@ -380,11 +441,11 @@ async def root(request: Request):
   }'</pre>
             </div>
             
-            <h2>CLI (Natural Language Support)</h2>
-            <p>The CLI supports natural language for easier scheduling:</p>
+            <h2>CLI TOOL</h2>
+            <p style="margin:8px 0;font-weight:700;">NATURAL LANGUAGE SCHEDULING SUPPORT</p>
             
             <div class="example">
-                <h3>Installation:</h3>
+                <p style="font-weight:900;margin:10px 0 6px 0;">INSTALLATION:</p>
                 <pre>git clone https://github.com/cpfiffer/letta-switchboard.git
 cd letta-switchboard/cli
 go build -o letta-switchboard
@@ -392,7 +453,7 @@ go build -o letta-switchboard
             </div>
             
             <div class="example">
-                <h3>Usage:</h3>
+                <p style="font-weight:900;margin:10px 0 6px 0;">USAGE:</p>
                 <pre># Send immediately
 ./letta-switchboard send --agent-id agent-xxx --message "Hello!"
 
@@ -403,7 +464,7 @@ go build -o letta-switchboard
 ./letta-switchboard recurring create --agent-id agent-xxx --message "Daily standup" --cron "every weekday"</pre>
             </div>
             
-            <h2>Available Endpoints</h2>
+            <h2>API ENDPOINTS</h2>
             <div class="endpoint"><code>POST /schedules/one-time</code> - Create a one-time schedule</div>
             <div class="endpoint"><code>POST /schedules/recurring</code> - Create a recurring schedule</div>
             <div class="endpoint"><code>GET /schedules/one-time</code> - List your one-time schedules</div>
@@ -416,14 +477,16 @@ go build -o letta-switchboard
             <div class="endpoint"><code>GET /results/{schedule_id}</code> - Get result for specific schedule</div>
             
             <div class="note">
-                <strong>Authentication:</strong> All endpoints require <code>Authorization: Bearer YOUR_LETTA_API_KEY</code> header
+                <strong>AUTHENTICATION:</strong> ALL ENDPOINTS REQUIRE<br>
+                <code>Authorization: Bearer YOUR_LETTA_API_KEY</code>
             </div>
             
-            <h2>Documentation & Support</h2>
-            <p>🎛️ <a href="/dashboard"><strong>Web Dashboard</strong></a> - Manage your schedules in your browser</p>
-            <p>📖 Full documentation: <a href="https://github.com/cpfiffer/letta-switchboard">github.com/cpfiffer/letta-switchboard</a></p>
-            <p>🐛 Issues & support: <a href="https://github.com/cpfiffer/letta-switchboard/issues">GitHub Issues</a></p>
-            <p>💬 API response: <a href="/?json">View as JSON</a></p>
+            <h2>DOCUMENTATION & SUPPORT</h2>
+            <p style="margin: 8px 0;"><a href="/dashboard">WEB DASHBOARD</a> - Manage schedules in browser</p>
+            <p style="margin: 8px 0;"><a href="https://github.com/cpfiffer/letta-switchboard">DOCUMENTATION</a> - Full technical reference</p>
+            <p style="margin: 8px 0;"><a href="https://github.com/cpfiffer/letta-switchboard/issues">SUPPORT</a> - Issue tracker</p>
+            <p style="margin: 8px 0;"><a href="/?json">JSON API</a> - View as JSON response</p>
+            </div>
         </body>
         </html>
         """
