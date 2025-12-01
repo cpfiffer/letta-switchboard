@@ -4,7 +4,7 @@
 
 Send messages to your Letta agents immediately or scheduled for later. Supports natural language scheduling ("in 5 minutes", "every weekday at 9am") and secure cross-agent communication.
 
-🌐 **Hosted Service:** `https://letta--switchboard-api.modal.run`  
+🌐 **Hosted Service:** https://letta--switchboard-api.modal.run
 🎛️ **Web Dashboard:** [`/dashboard`](https://letta--switchboard-api.modal.run/dashboard)  
 💻 **CLI:** [`letta-switchboard`](cli/)  
 🔒 **Security:** End-to-end encryption, API key isolation  
