@@ -296,215 +296,258 @@ async def root(request: Request):
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
+                * { box-sizing: border-box; }
                 body {
-                    font-family: 'Courier New', 'Consolas', monospace;
-                    background: #f5f5dc;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    background: #f8f9fa;
                     margin: 0;
-                    padding: 15px;
-                    line-height: 1.5;
-                    font-weight: 500;
+                    padding: 24px;
+                    line-height: 1.6;
+                    color: #1a1a1a;
                 }
                 .container {
-                    max-width: 900px;
+                    max-width: 720px;
                     margin: 0 auto;
-                    background: white;
-                    padding: 30px;
-                    box-shadow: 0 0 20px rgba(0,0,0,0.1);
                 }
                 h1 {
-                    color: #000;
-                    margin-bottom: 8px;
-                    font-size: 24px;
-                    letter-spacing: 3px;
-                    font-weight: bold;
-                    text-transform: uppercase;
-                    border-bottom: 2px solid #000;
-                    padding-bottom: 8px;
+                    font-size: 28px;
+                    font-weight: 600;
+                    margin: 0 0 8px 0;
+                }
+                .subtitle {
+                    color: #666;
+                    margin-bottom: 24px;
+                }
+                .status {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    background: #e8f5e9;
+                    color: #2e7d32;
+                    padding: 4px 10px;
+                    border-radius: 4px;
+                    font-size: 13px;
+                    font-weight: 500;
+                    margin-bottom: 24px;
+                }
+                .status::before {
+                    content: '';
+                    width: 8px;
+                    height: 8px;
+                    background: #4caf50;
+                    border-radius: 50%;
+                }
+                .dashboard-btn {
+                    display: inline-block;
+                    background: #1a1a1a;
+                    color: white;
+                    padding: 12px 24px;
+                    text-decoration: none;
+                    border-radius: 6px;
+                    font-weight: 500;
+                    margin-bottom: 32px;
+                }
+                .dashboard-btn:hover {
+                    background: #333;
                 }
                 h2 {
-                    color: #000;
-                    margin: 20px 0 10px;
-                    font-size: 16px;
-                    letter-spacing: 2px;
-                    font-weight: bold;
-                    text-transform: uppercase;
-                    border-bottom: 2px solid #000;
-                    padding-bottom: 3px;
+                    font-size: 18px;
+                    font-weight: 600;
+                    margin: 32px 0 12px 0;
+                    padding-bottom: 8px;
+                    border-bottom: 1px solid #e0e0e0;
                 }
-                .info-box {
-                    border: 2px solid #000;
-                    padding: 12px;
-                    margin: 15px 0;
-                    background: #fafafa;
+                .features {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                    gap: 12px;
+                    margin-bottom: 8px;
                 }
-                .info-box pre {
-                    font-family: 'Courier New', monospace;
+                .feature {
+                    background: white;
+                    padding: 12px 16px;
+                    border-radius: 6px;
+                    border: 1px solid #e0e0e0;
+                }
+                .feature-title {
+                    font-weight: 600;
+                    margin-bottom: 2px;
+                }
+                .feature-desc {
+                    color: #666;
+                    font-size: 14px;
+                }
+                pre {
+                    background: #1a1a1a;
+                    color: #e0e0e0;
+                    padding: 16px;
+                    border-radius: 6px;
+                    overflow-x: auto;
+                    font-family: 'SF Mono', Consolas, monospace;
                     font-size: 13px;
-                    line-height: 1.6;
-                    margin: 0;
-                    font-weight: 500;
+                    line-height: 1.5;
+                    margin: 12px 0;
                 }
-                .feature-list {
-                    list-style: none;
-                    padding: 0;
-                    margin: 10px 0;
-                }
-                .feature-list li {
-                    padding: 4px 0;
-                    font-weight: 500;
-                }
-                .feature-list li:before {
-                    content: "▪ ";
-                    color: #000;
-                    font-weight: bold;
-                }
+                pre .comment { color: #6a9955; }
+                pre .string { color: #ce9178; }
                 code {
                     background: #f0f0f0;
                     padding: 2px 6px;
-                    border: 1px solid #000;
-                    font-weight: 500;
+                    border-radius: 3px;
+                    font-family: 'SF Mono', Consolas, monospace;
+                    font-size: 13px;
                 }
-                pre {
-                    background: #fafafa;
-                    border: 2px solid #000;
-                    padding: 12px;
-                    overflow-x: auto;
-                    margin: 10px 0;
-                    font-weight: 500;
+                .endpoints {
+                    background: white;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 6px;
+                    overflow: hidden;
                 }
                 .endpoint {
-                    background: #fafafa;
-                    padding: 8px 12px;
-                    margin: 6px 0;
-                    border: 2px solid #000;
-                    font-weight: 500;
+                    display: flex;
+                    padding: 10px 16px;
+                    border-bottom: 1px solid #e0e0e0;
+                    font-size: 14px;
                 }
-                a {
-                    color: #000;
-                    text-decoration: underline;
-                    font-weight: bold;
+                .endpoint:last-child { border-bottom: none; }
+                .endpoint-method {
+                    font-family: 'SF Mono', Consolas, monospace;
+                    font-weight: 600;
+                    width: 220px;
+                    flex-shrink: 0;
                 }
-                a:hover {
-                    background: #000;
-                    color: white;
+                .endpoint-desc {
+                    color: #666;
                 }
                 .note {
-                    background: #fafafa;
-                    border: 2px solid #000;
-                    padding: 12px;
-                    margin: 15px 0;
+                    background: #fff3e0;
+                    border-left: 3px solid #ff9800;
+                    padding: 12px 16px;
+                    margin: 16px 0;
+                    border-radius: 0 6px 6px 0;
+                }
+                .links {
+                    display: flex;
+                    gap: 24px;
+                    flex-wrap: wrap;
+                }
+                .links a {
+                    color: #1a1a1a;
+                    text-decoration: none;
                     font-weight: 500;
                 }
-                .dashboard-link {
-                    display: block;
-                    background: #000;
-                    color: white;
-                    padding: 15px;
-                    text-align: center;
-                    text-decoration: none;
-                    font-weight: bold;
-                    font-size: 16px;
-                    letter-spacing: 2px;
-                    margin: 20px 0;
-                    border: 3px solid #000;
+                .links a:hover {
+                    text-decoration: underline;
                 }
-                .dashboard-link:hover {
-                    background: white;
-                    color: #000;
+                @media (max-width: 600px) {
+                    .endpoint { flex-direction: column; gap: 4px; }
+                    .endpoint-method { width: auto; }
                 }
             </style>
         </head>
         <body>
             <div class="container">
-            <h1>LETTA SWITCHBOARD</h1>
-            <div class="info-box">
-                <pre>SERVICE:  MESSAGE ROUTING FOR LETTA AGENTS
-VERSION:  1.0.0
-STATUS:   OPERATIONAL
-HOSTING:  FREE SERVERLESS DEPLOYMENT</pre>
-            </div>
-            
-            <a href="/dashboard" class="dashboard-link">→ OPEN WEB DASHBOARD ←</a>
-            
-            <h2>FEATURES</h2>
-            <ul class="feature-list">
-                <li>IMMEDIATE OR SCHEDULED MESSAGE DELIVERY</li>
-                <li>RECURRING SCHEDULES WITH CRON EXPRESSIONS</li>
-                <li>SECURE API KEY ISOLATION</li>
-                <li>EXECUTION TRACKING WITH RUN IDS</li>
-            </ul>
-            
-            <h2>QUICK START</h2>
-            
-            <div class="example">
-                <p style="font-weight:bold;margin:10px 0 6px 0;">SEND ONE-TIME MESSAGE:</p>
+                <h1>Letta Switchboard</h1>
+                <p class="subtitle">Message scheduling and routing for Letta agents</p>
+                <div class="status">Operational</div>
+                <br>
+                <a href="/dashboard" class="dashboard-btn">Open Dashboard</a>
+
+                <h2>Features</h2>
+                <div class="features">
+                    <div class="feature">
+                        <div class="feature-title">Scheduled Messages</div>
+                        <div class="feature-desc">Send messages now or schedule for later</div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-title">Recurring Schedules</div>
+                        <div class="feature-desc">Cron expressions for repeated delivery</div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-title">API Key Isolation</div>
+                        <div class="feature-desc">Secure per-user schedule storage</div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-title">Execution Tracking</div>
+                        <div class="feature-desc">Track results with run IDs</div>
+                    </div>
+                </div>
+
+                <h2>Quick Start</h2>
+                <p>Schedule a one-time message:</p>
                 <pre>curl -X POST https://letta--switchboard-api.modal.run/schedules/one-time \\
   -H 'Authorization: Bearer YOUR_LETTA_API_KEY' \\
   -H 'Content-Type: application/json' \\
   -d '{
-    "agent_id": "agent-xxx",
-    "execute_at": "2025-11-13T09:00:00Z",
-    "message": "Hello from Switchboard!"
+    <span class="string">"agent_id"</span>: <span class="string">"agent-xxx"</span>,
+    <span class="string">"execute_at"</span>: <span class="string">"2025-12-09T09:00:00Z"</span>,
+    <span class="string">"message"</span>: <span class="string">"Hello from Switchboard!"</span>
   }'</pre>
-            </div>
-            
-            <div class="example">
-                <p style="font-weight:bold;margin:10px 0 6px 0;">CREATE RECURRING SCHEDULE:</p>
+
+                <p>Create a recurring schedule:</p>
                 <pre>curl -X POST https://letta--switchboard-api.modal.run/schedules/recurring \\
   -H 'Authorization: Bearer YOUR_LETTA_API_KEY' \\
   -H 'Content-Type: application/json' \\
   -d '{
-    "agent_id": "agent-xxx",
-    "cron": "0 9 * * 1-5",
-    "message": "Daily standup reminder"
+    <span class="string">"agent_id"</span>: <span class="string">"agent-xxx"</span>,
+    <span class="string">"cron"</span>: <span class="string">"0 9 * * 1-5"</span>,
+    <span class="string">"message"</span>: <span class="string">"Daily standup reminder"</span>
   }'</pre>
-            </div>
-            
-            <h2>CLI TOOL</h2>
-            <p style="margin:8px 0;">NATURAL LANGUAGE SCHEDULING SUPPORT</p>
-            
-            <div class="example">
-                <p style="font-weight:bold;margin:10px 0 6px 0;">INSTALLATION:</p>
-                <pre>git clone https://github.com/cpfiffer/letta-switchboard.git
-cd letta-switchboard/cli
-go build -o letta-switchboard
-./letta-switchboard config set-api-key YOUR_LETTA_API_KEY</pre>
-            </div>
-            
-            <div class="example">
-                <p style="font-weight:bold;margin:10px 0 6px 0;">USAGE:</p>
-                <pre># Send immediately
-./letta-switchboard send --agent-id agent-xxx --message "Hello!"
 
-# Schedule with natural language
-./letta-switchboard send --agent-id agent-xxx --message "Reminder" --execute-at "tomorrow at 9am"
+                <h2>CLI Tool</h2>
+                <p>Natural language scheduling from your terminal:</p>
+                <pre><span class="comment"># Install</span>
+git clone https://github.com/cpfiffer/letta-switchboard.git
+cd letta-switchboard/cli && go build -o letta-schedules
+./letta-schedules config set-api-key YOUR_LETTA_API_KEY
 
-# Recurring schedule
-./letta-switchboard recurring create --agent-id agent-xxx --message "Daily standup" --cron "every weekday"</pre>
-            </div>
-            
-            <h2>API ENDPOINTS</h2>
-            <div class="endpoint"><code>POST /schedules/one-time</code> - Create a one-time schedule</div>
-            <div class="endpoint"><code>POST /schedules/recurring</code> - Create a recurring schedule</div>
-            <div class="endpoint"><code>GET /schedules/one-time</code> - List your one-time schedules</div>
-            <div class="endpoint"><code>GET /schedules/recurring</code> - List your recurring schedules</div>
-            <div class="endpoint"><code>GET /schedules/one-time/{id}</code> - Get specific one-time schedule</div>
-            <div class="endpoint"><code>GET /schedules/recurring/{id}</code> - Get specific recurring schedule</div>
-            <div class="endpoint"><code>DELETE /schedules/one-time/{id}</code> - Delete one-time schedule</div>
-            <div class="endpoint"><code>DELETE /schedules/recurring/{id}</code> - Delete recurring schedule</div>
-            <div class="endpoint"><code>GET /results</code> - List execution results</div>
-            <div class="endpoint"><code>GET /results/{schedule_id}</code> - Get result for specific schedule</div>
-            
-            <div class="note">
-                <strong>AUTHENTICATION:</strong> ALL ENDPOINTS REQUIRE<br>
-                <code>Authorization: Bearer YOUR_LETTA_API_KEY</code>
-            </div>
-            
-            <h2>DOCUMENTATION & SUPPORT</h2>
-            <p style="margin: 8px 0;"><a href="/dashboard">WEB DASHBOARD</a> - Manage schedules in browser</p>
-            <p style="margin: 8px 0;"><a href="https://github.com/cpfiffer/letta-switchboard">DOCUMENTATION</a> - Full technical reference</p>
-            <p style="margin: 8px 0;"><a href="https://github.com/cpfiffer/letta-switchboard/issues">SUPPORT</a> - Issue tracker</p>
-            <p style="margin: 8px 0;"><a href="/?json">JSON API</a> - View as JSON response</p>
+<span class="comment"># Send a message</span>
+./letta-schedules send --agent-id agent-xxx --message "Hello!"
+
+<span class="comment"># Schedule with natural language</span>
+./letta-schedules send --agent-id agent-xxx --message "Reminder" --at "tomorrow 9am"
+
+<span class="comment"># Create recurring schedule</span>
+./letta-schedules recurring create --agent-id agent-xxx --cron "every weekday" --message "Standup"</pre>
+
+                <h2>API Endpoints</h2>
+                <div class="endpoints">
+                    <div class="endpoint">
+                        <span class="endpoint-method">POST /schedules/one-time</span>
+                        <span class="endpoint-desc">Create one-time schedule</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="endpoint-method">POST /schedules/recurring</span>
+                        <span class="endpoint-desc">Create recurring schedule</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="endpoint-method">GET /schedules/one-time</span>
+                        <span class="endpoint-desc">List one-time schedules</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="endpoint-method">GET /schedules/recurring</span>
+                        <span class="endpoint-desc">List recurring schedules</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="endpoint-method">DELETE /schedules/{type}/{id}</span>
+                        <span class="endpoint-desc">Delete a schedule</span>
+                    </div>
+                    <div class="endpoint">
+                        <span class="endpoint-method">GET /results</span>
+                        <span class="endpoint-desc">List execution results</span>
+                    </div>
+                </div>
+
+                <div class="note">
+                    <strong>Authentication required:</strong> All endpoints need <code>Authorization: Bearer YOUR_LETTA_API_KEY</code>
+                </div>
+
+                <h2>Links</h2>
+                <div class="links">
+                    <a href="/dashboard">Dashboard</a>
+                    <a href="https://github.com/cpfiffer/letta-switchboard">Documentation</a>
+                    <a href="https://github.com/cpfiffer/letta-switchboard/issues">Support</a>
+                </div>
             </div>
         </body>
         </html>
@@ -779,13 +822,14 @@ async def execute_schedule(
             error=error_msg,
             status="failed"
         )
-        
-        # Terminate recurring schedules on failure (no retries)
-        if schedule_type == "recurring":
+
+        # Only terminate recurring schedules on permanent errors (401, 404)
+        # Transient errors (timeouts, rate limits, 5xx) should not remove the schedule
+        if schedule_type == "recurring" and result.get("permanent", False):
             try:
                 Path(file_path).unlink()
                 volume.commit()
-                logger.warning(f"Terminated recurring schedule {schedule_id} due to execution failure: {error_msg}")
+                logger.warning(f"Terminated recurring schedule {schedule_id} due to permanent error: {error_msg}")
             except Exception as e:
                 logger.error(f"Failed to delete failed recurring schedule {schedule_id}: {e}")
     

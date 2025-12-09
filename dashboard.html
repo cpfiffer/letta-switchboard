@@ -7,370 +7,436 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Courier New', 'Consolas', monospace;
-            background: #f5f5dc;
-            color: #000;
-            padding: 15px;
-            line-height: 1.5;
-            font-weight: 500;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #1a1a1a;
+            padding: 24px;
+            line-height: 1.6;
         }
-        .container { max-width: 1400px; margin: 0 auto; background: white; padding: 30px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-        h1 { 
-            color: #000;
-            margin-bottom: 8px;
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .header h1 {
             font-size: 24px;
-            letter-spacing: 3px;
-            font-weight: bold;
-            text-transform: uppercase;
+            font-weight: 600;
         }
-        h2 { 
-            color: #000;
-            margin: 20px 0 10px;
+        .header-links {
+            display: flex;
+            gap: 16px;
+        }
+        .header-links a {
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .header-links a:hover {
+            color: #1a1a1a;
+        }
+
+        h2 {
             font-size: 16px;
-            letter-spacing: 2px;
-            font-weight: bold;
-            text-transform: uppercase;
-            border-bottom: 2px solid #000;
-            padding-bottom: 3px;
+            font-weight: 600;
+            margin: 24px 0 12px 0;
+            color: #1a1a1a;
         }
-        
+
         /* API Key Section */
-        #api-key-section {
-            background: #fafafa;
-            border: 2px solid #000;
-            padding: 15px;
+        .card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
             margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #666;
         }
         #api-key-section input {
             width: 100%;
-            padding: 8px;
-            border: 2px solid #666;
-            background: white;
-            color: #000;
-            font-family: 'Courier New', monospace;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
             font-size: 14px;
-            font-weight: 500;
+            margin-bottom: 12px;
         }
         #api-key-section input:focus {
             outline: none;
-            border-color: #000;
-            box-shadow: none;
+            border-color: #1a1a1a;
         }
-        
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
         /* Buttons */
-        button {
-            background: white;
-            color: #000;
-            border: 2px solid #000;
-            padding: 8px 16px;
-            cursor: pointer;
-            font-size: 13px;
-            font-family: 'Courier New', monospace;
-            margin-top: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: bold;
-        }
-        button:hover { 
-            background: #000;
+        button, .btn {
+            background: #1a1a1a;
             color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
         }
-        button.danger { 
-            border-color: #000;
-            color: #000;
+        button:hover { background: #333; }
+        button.secondary {
+            background: white;
+            color: #1a1a1a;
+            border: 1px solid #e0e0e0;
+        }
+        button.secondary:hover {
+            background: #f5f5f5;
+        }
+        button.danger {
+            background: white;
+            color: #dc2626;
+            border: 1px solid #fecaca;
         }
         button.danger:hover {
-            background: #000;
-            color: white;
+            background: #fef2f2;
         }
-        
+        button.sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
         /* Tabs */
         .tabs {
             display: flex;
-            gap: 2px;
-            margin-bottom: 0;
-            border-bottom: 3px solid #000;
+            gap: 4px;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 20px;
         }
         .tab {
             padding: 10px 20px;
-            background: #e8e8e8;
-            color: #000;
-            border: 2px solid #000;
-            border-bottom: none;
+            background: transparent;
+            color: #666;
+            border: none;
+            border-bottom: 2px solid transparent;
             cursor: pointer;
-            font-weight: bold;
-            font-family: 'Courier New', monospace;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 13px;
+            font-weight: 500;
+            font-size: 14px;
+            border-radius: 0;
+            margin-bottom: -1px;
         }
-        .tab:hover { background: #d0d0d0; }
-        .tab.active { 
-            background: white;
-            color: #000;
-            border-bottom: 2px solid white;
-            margin-bottom: -2px;
+        .tab:hover {
+            color: #1a1a1a;
+            background: transparent;
         }
-        
+        .tab.active {
+            color: #1a1a1a;
+            border-bottom-color: #1a1a1a;
+            background: transparent;
+        }
+
         /* Content */
         .content {
-            background: white;
-            border: 2px solid #000;
-            border-top: none;
-            padding: 15px;
             display: none;
         }
         .content.active { display: block; }
-        
+
         /* Tables */
+        .table-container {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
-            border: 2px solid #000;
         }
         th, td {
-            padding: 8px 12px;
+            padding: 12px 16px;
             text-align: left;
-            border: 1px solid #000;
+            border-bottom: 1px solid #e0e0e0;
         }
-        th { 
-            background: #f0f0f0;
-            font-weight: bold;
-            color: #000;
-            text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 1px;
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 13px;
+            color: #666;
         }
-        tr:hover { background: #fafafa; }
-        td { font-size: 14px; font-weight: 500; }
-        
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafafa; }
+        td { font-size: 14px; }
+
         /* Forms */
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
         label {
             display: block;
             margin-bottom: 6px;
-            font-weight: bold;
-            color: #000;
-            text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 1px;
+            font-weight: 500;
+            font-size: 14px;
         }
         input[type="text"], input[type="datetime-local"], textarea, select {
             width: 100%;
-            padding: 8px;
-            border: 2px solid #666;
-            background: white;
-            color: #000;
-            font-family: 'Courier New', monospace;
-            font-size: 15px;
-            font-weight: 500;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
         }
         input:focus, textarea:focus, select:focus {
             outline: none;
-            border-color: #000;
-            box-shadow: none;
+            border-color: #1a1a1a;
         }
-        textarea { min-height: 80px; }
-        small { color: #666; font-size: 12px; font-weight: 500; }
-        
+        textarea { min-height: 100px; resize: vertical; }
+        .help-text { color: #666; font-size: 13px; margin-top: 4px; }
+
         /* Status badges */
         .badge {
-            padding: 3px 8px;
-            border: 2px solid;
-            font-size: 11px;
-            font-weight: bold;
-            font-family: 'Courier New', monospace;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
         }
-        .badge.success { 
-            border-color: #000;
-            color: #000;
-            background: white;
+        .badge.success {
+            background: #dcfce7;
+            color: #166534;
         }
-        .badge.failed { 
-            border-color: #000;
-            color: white;
-            background: #000;
+        .badge.failed {
+            background: #fef2f2;
+            color: #dc2626;
         }
-        
+
         .hidden { display: none; }
-        .error { color: #000; margin-top: 8px; font-weight: bold; }
-        .empty { text-align: center; padding: 30px; color: #666; font-weight: 500; }
-        
+        .error { color: #dc2626; margin-top: 8px; font-size: 14px; }
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        /* Status indicator */
+        .status-msg {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        .status-msg.success { color: #166534; }
+        .status-msg.error { color: #dc2626; }
+
         /* Loading spinner */
         .loading {
             text-align: center;
             padding: 40px;
-            color: #000;
+            color: #666;
         }
         .spinner {
             display: inline-block;
-            width: 40px;
-            height: 40px;
-            border: 4px solid #e0e0e0;
-            border-top-color: #000;
+            width: 32px;
+            height: 32px;
+            border: 3px solid #e0e0e0;
+            border-top-color: #1a1a1a;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 10px;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 8px;
         }
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0.3; }
+
+        .mono {
+            font-family: 'SF Mono', Consolas, monospace;
+            font-size: 13px;
         }
-        .blink { animation: blink 1s infinite; }
+
+        @media (max-width: 768px) {
+            body { padding: 16px; }
+            th, td { padding: 10px 12px; }
+            .header { flex-direction: column; align-items: flex-start; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>LETTA SWITCHBOARD — MESSAGE ROUTING SERVICE</h1>
-        <div style="border: 2px solid #000; padding: 12px; margin-bottom: 20px; background: #fafafa;">
-            <pre style="font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.6; margin: 0; font-weight: normal;">SYSTEM:   MESSAGE ROUTING TERMINAL
-VERSION:  1.0.0
-STATUS:   OPERATIONAL
-PROTOCOL: REST API + SCHEDULED EXECUTION</pre>
+        <div class="header">
+            <h1>Switchboard Dashboard</h1>
+            <div class="header-links">
+                <a href="/">Home</a>
+                <a href="https://github.com/cpfiffer/letta-switchboard">Docs</a>
+            </div>
         </div>
-        
+
         <!-- API Key Input -->
-        <div id="api-key-section">
-            <label for="api-key-input">AUTHENTICATION</label>
-            <input type="password" id="api-key-input" placeholder="sk-let-...">
-            <button onclick="saveApiKey()">SAVE KEY</button>
-            <button onclick="clearApiKey()" class="danger">CLEAR KEY</button>
+        <div id="api-key-section" class="card">
+            <div class="card-title">Authentication</div>
+            <input type="password" id="api-key-input" placeholder="Enter your Letta API key (sk-let-...)">
+            <div class="btn-group">
+                <button onclick="saveApiKey()">Connect</button>
+                <button onclick="clearApiKey()" class="secondary">Disconnect</button>
+            </div>
             <div id="api-key-status"></div>
         </div>
-        
+
         <div id="main-content" class="hidden">
             <!-- Tabs -->
             <div class="tabs">
-                <button class="tab active" onclick="showTab('schedules')">SCHEDULES</button>
-                <button class="tab" onclick="showTab('create')">CREATE NEW</button>
-                <button class="tab" onclick="showTab('results')">RESULTS</button>
+                <button class="tab active" onclick="showTab('schedules')">Schedules</button>
+                <button class="tab" onclick="showTab('create')">Create New</button>
+                <button class="tab" onclick="showTab('results')">Results</button>
             </div>
-            
+
             <!-- Schedules Tab -->
             <div id="schedules-tab" class="content active">
-                <h2>ONE-TIME SCHEDULES</h2>
-                <table id="onetime-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Agent ID</th>
-                            <th>Execute At</th>
-                            <th>Message</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                
-                <h2>RECURRING SCHEDULES</h2>
-                <table id="recurring-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Agent ID</th>
-                            <th>Cron</th>
-                            <th>Message</th>
-                            <th>Last Run</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                
-                <button onclick="loadSchedules()" style="margin-top: 20px;">REFRESH</button>
+                <h2>One-Time Schedules</h2>
+                <div class="table-container">
+                    <table id="onetime-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Agent ID</th>
+                                <th>Execute At</th>
+                                <th>Message</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <h2>Recurring Schedules</h2>
+                <div class="table-container">
+                    <table id="recurring-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Agent ID</th>
+                                <th>Cron</th>
+                                <th>Timezone</th>
+                                <th>Message</th>
+                                <th>Last Run</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <button onclick="loadSchedules()" class="secondary">Refresh</button>
             </div>
-            
+
             <!-- Create Tab -->
             <div id="create-tab" class="content">
-                <h2>CREATE SCHEDULE</h2>
-                
-                <div class="form-group">
-                    <label>SCHEDULE TYPE</label>
-                    <select id="schedule-type" onchange="toggleScheduleType()">
-                        <option value="onetime">One-Time</option>
-                        <option value="recurring">Recurring</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="agent-id">AGENT ID</label>
-                    <input type="text" id="agent-id" placeholder="agent-xxx">
-                </div>
-                
-                <div class="form-group">
-                    <label for="message">MESSAGE</label>
-                    <textarea id="message" placeholder="Your message to the agent"></textarea>
-                </div>
-                
-                <div id="onetime-fields">
+                <div class="card">
+                    <h2 style="margin-top: 0;">Create Schedule</h2>
+
                     <div class="form-group">
-                        <label for="execute-at">EXECUTE AT</label>
-                        <input type="datetime-local" id="execute-at">
-                    </div>
-                    <div class="form-group">
-                        <label for="timezone">TIMEZONE</label>
-                        <select id="timezone">
-                            <option value="local" selected>Local Browser Time</option>
-                            <option value="UTC">UTC</option>
-                            <option value="America/New_York">Eastern (US)</option>
-                            <option value="America/Chicago">Central (US)</option>
-                            <option value="America/Denver">Mountain (US)</option>
-                            <option value="America/Los_Angeles">Pacific (US)</option>
-                            <option value="Europe/London">London</option>
-                            <option value="Europe/Paris">Paris</option>
-                            <option value="Asia/Tokyo">Tokyo</option>
+                        <label>Schedule Type</label>
+                        <select id="schedule-type" onchange="toggleScheduleType()">
+                            <option value="onetime">One-Time</option>
+                            <option value="recurring">Recurring</option>
                         </select>
-                        <small style="display:block;margin-top:5px;color:#6b7280;">Time will be converted to UTC for storage</small>
                     </div>
-                </div>
-                
-                <div id="recurring-fields" class="hidden">
+
                     <div class="form-group">
-                        <label for="cron">CRON EXPRESSION</label>
-                        <input type="text" id="cron" placeholder="0 9 * * 1-5">
-                        <small style="display:block;margin-top:5px;color:#6b7280;">Examples: "0 9 * * *" (daily at 9am), "*/5 * * * *" (every 5 min)</small>
+                        <label for="agent-id">Agent ID</label>
+                        <input type="text" id="agent-id" placeholder="agent-xxx">
                     </div>
+
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" placeholder="Your message to the agent"></textarea>
+                    </div>
+
+                    <div id="onetime-fields">
+                        <div class="form-group">
+                            <label for="execute-at">Execute At</label>
+                            <input type="datetime-local" id="execute-at">
+                        </div>
+                        <div class="form-group">
+                            <label for="timezone">Timezone</label>
+                            <select id="timezone">
+                                <option value="local" selected>Local Browser Time</option>
+                                <option value="UTC">UTC</option>
+                                <option value="America/New_York">Eastern (US)</option>
+                                <option value="America/Chicago">Central (US)</option>
+                                <option value="America/Denver">Mountain (US)</option>
+                                <option value="America/Los_Angeles">Pacific (US)</option>
+                                <option value="Europe/London">London</option>
+                                <option value="Europe/Paris">Paris</option>
+                                <option value="Asia/Tokyo">Tokyo</option>
+                            </select>
+                            <div class="help-text">Time will be converted to UTC for storage</div>
+                        </div>
+                    </div>
+
+                    <div id="recurring-fields" class="hidden">
+                        <div class="form-group">
+                            <label for="cron">Cron Expression</label>
+                            <input type="text" id="cron" placeholder="0 9 * * 1-5">
+                            <div class="help-text">Examples: "0 9 * * *" (daily at 9am), "*/5 * * * *" (every 5 min)</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="recurring-timezone">Timezone</label>
+                            <select id="recurring-timezone">
+                                <option value="UTC" selected>UTC</option>
+                                <option value="America/New_York">Eastern (US)</option>
+                                <option value="America/Chicago">Central (US)</option>
+                                <option value="America/Denver">Mountain (US)</option>
+                                <option value="America/Los_Angeles">Pacific (US)</option>
+                                <option value="Europe/London">London</option>
+                                <option value="Europe/Paris">Paris</option>
+                                <option value="Asia/Tokyo">Tokyo</option>
+                            </select>
+                            <div class="help-text">Cron expression will be evaluated in this timezone</div>
+                        </div>
+                    </div>
+
+                    <button onclick="createSchedule()">Create Schedule</button>
+                    <div id="create-error" class="error"></div>
                 </div>
-                
-                <button onclick="createSchedule()">CREATE SCHEDULE</button>
-                <div id="create-error" class="error"></div>
             </div>
-            
+
             <!-- Results Tab -->
             <div id="results-tab" class="content">
-                <h2>EXECUTION RESULTS</h2>
-                <table id="results-table">
-                    <thead>
-                        <tr>
-                            <th>Schedule ID</th>
-                            <th>Type</th>
-                            <th>Status</th>
-                            <th>Agent ID</th>
-                            <th>Message</th>
-                            <th>Run ID / Error</th>
-                            <th>Executed At</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                
-                <button onclick="loadResults()" style="margin-top: 20px;">REFRESH</button>
+                <h2>Execution Results</h2>
+                <div class="table-container">
+                    <table id="results-table">
+                        <thead>
+                            <tr>
+                                <th>Schedule ID</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Agent ID</th>
+                                <th>Message</th>
+                                <th>Run ID / Error</th>
+                                <th>Executed At</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <button onclick="loadResults()" class="secondary">Refresh</button>
             </div>
         </div>
     </div>
-    
+
     <script>
         const API_BASE = window.location.origin;
         let API_KEY = sessionStorage.getItem('letta_api_key') || '';
-        
+
         // Initialize
         if (API_KEY) {
             document.getElementById('api-key-input').value = API_KEY;
@@ -378,49 +444,53 @@ PROTOCOL: REST API + SCHEDULED EXECUTION</pre>
             loadSchedules();
             loadResults();
         }
-        
+
         function saveApiKey() {
             API_KEY = document.getElementById('api-key-input').value.trim();
             if (!API_KEY) {
-                alert('ERROR: API KEY REQUIRED');
+                showStatus('api-key-status', 'API key is required', 'error');
                 return;
             }
             sessionStorage.setItem('letta_api_key', API_KEY);
             document.getElementById('main-content').classList.remove('hidden');
-            document.getElementById('api-key-status').innerHTML = '<p style="color:#000;margin-top:10px;font-weight:bold;">✓ API KEY AUTHENTICATED</p>';
+            showStatus('api-key-status', 'Connected successfully', 'success');
             loadSchedules();
             loadResults();
         }
-        
+
         function clearApiKey() {
             sessionStorage.removeItem('letta_api_key');
             API_KEY = '';
             document.getElementById('api-key-input').value = '';
             document.getElementById('main-content').classList.add('hidden');
-            document.getElementById('api-key-status').innerHTML = '<p style="color:#000;margin-top:10px;font-weight:bold;">✗ SESSION TERMINATED</p>';
+            showStatus('api-key-status', 'Disconnected', 'error');
         }
-        
+
+        function showStatus(elementId, message, type) {
+            const el = document.getElementById(elementId);
+            el.innerHTML = `<div class="status-msg ${type}">${message}</div>`;
+        }
+
         function showTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
             event.target.classList.add('active');
             document.getElementById(`${tab}-tab`).classList.add('active');
         }
-        
+
         function toggleScheduleType() {
             const type = document.getElementById('schedule-type').value;
             document.getElementById('onetime-fields').classList.toggle('hidden', type !== 'onetime');
             document.getElementById('recurring-fields').classList.toggle('hidden', type !== 'recurring');
         }
-        
+
         async function loadSchedules() {
             const onetimeBody = document.querySelector('#onetime-table tbody');
             const recurringBody = document.querySelector('#recurring-table tbody');
-            
-            // Show loading spinners
+
             onetimeBody.innerHTML = '<tr><td colspan="5" class="loading"><div class="spinner"></div><p>Loading...</p></td></tr>';
-            recurringBody.innerHTML = '<tr><td colspan="6" class="loading"><div class="spinner"></div><p>Loading...</p></td></tr>';
-            
+            recurringBody.innerHTML = '<tr><td colspan="7" class="loading"><div class="spinner"></div><p>Loading...</p></td></tr>';
+
             try {
                 const [onetime, recurring] = await Promise.all([
                     fetch(`${API_BASE}/schedules/one-time`, {
@@ -430,107 +500,98 @@ PROTOCOL: REST API + SCHEDULED EXECUTION</pre>
                         headers: { 'Authorization': `Bearer ${API_KEY}` }
                     }).then(r => r.json())
                 ]);
-                
-                // One-time schedules
+
                 onetimeBody.innerHTML = onetime.length ? onetime.map(s => `
                     <tr>
-                        <td>${s.id.substring(0, 8)}...</td>
-                        <td>${s.agent_id}</td>
+                        <td class="mono">${s.id.substring(0, 8)}...</td>
+                        <td class="mono">${s.agent_id}</td>
                         <td>${new Date(s.execute_at).toLocaleString()}</td>
                         <td>${truncate(s.message, 50)}</td>
-                        <td><button class="danger" onclick="deleteSchedule('one-time', '${s.id}')">DEL</button></td>
+                        <td><button class="danger sm" onclick="deleteSchedule('one-time', '${s.id}')">Delete</button></td>
                     </tr>
                 `).join('') : '<tr><td colspan="5" class="empty">No one-time schedules</td></tr>';
-                
-                // Recurring schedules
-                const recurringBody = document.querySelector('#recurring-table tbody');
+
                 recurringBody.innerHTML = recurring.length ? recurring.map(s => `
                     <tr>
-                        <td>${s.id.substring(0, 8)}...</td>
-                        <td>${s.agent_id}</td>
-                        <td>${s.cron}</td>
+                        <td class="mono">${s.id.substring(0, 8)}...</td>
+                        <td class="mono">${s.agent_id}</td>
+                        <td class="mono">${s.cron}</td>
+                        <td>${s.timezone || 'UTC'}</td>
                         <td>${truncate(s.message, 50)}</td>
                         <td>${s.last_run ? new Date(s.last_run).toLocaleString() : 'Never'}</td>
-                        <td><button class="danger" onclick="deleteSchedule('recurring', '${s.id}')">DEL</button></td>
+                        <td><button class="danger sm" onclick="deleteSchedule('recurring', '${s.id}')">Delete</button></td>
                     </tr>
-                `).join('') : '<tr><td colspan="6" class="empty">No recurring schedules</td></tr>';
+                `).join('') : '<tr><td colspan="7" class="empty">No recurring schedules</td></tr>';
             } catch (error) {
-                alert('ERROR LOADING SCHEDULES: ' + error.message);
+                onetimeBody.innerHTML = `<tr><td colspan="5" class="empty">Error loading schedules</td></tr>`;
+                recurringBody.innerHTML = `<tr><td colspan="7" class="empty">Error loading schedules</td></tr>`;
             }
         }
-        
+
         async function loadResults() {
             const resultsBody = document.querySelector('#results-table tbody');
-            
-            // Show loading spinner
+
             resultsBody.innerHTML = '<tr><td colspan="7" class="loading"><div class="spinner"></div><p>Loading...</p></td></tr>';
-            
+
             try {
                 const results = await fetch(`${API_BASE}/results`, {
                     headers: { 'Authorization': `Bearer ${API_KEY}` }
                 }).then(r => r.json());
-                
+
                 resultsBody.innerHTML = results.length ? results.map(r => `
                     <tr>
-                        <td>${r.schedule_id.substring(0, 8)}...</td>
+                        <td class="mono">${r.schedule_id.substring(0, 8)}...</td>
                         <td>${r.schedule_type}</td>
                         <td><span class="badge ${r.status}">${r.status}</span></td>
-                        <td>${r.agent_id}</td>
+                        <td class="mono">${r.agent_id}</td>
                         <td>${truncate(r.message, 30)}</td>
-                        <td>${r.run_id || r.error || 'N/A'}</td>
+                        <td class="mono">${r.run_id || r.error || '-'}</td>
                         <td>${new Date(r.executed_at).toLocaleString()}</td>
                     </tr>
                 `).join('') : '<tr><td colspan="7" class="empty">No execution results</td></tr>';
             } catch (error) {
-                alert('ERROR LOADING RESULTS: ' + error.message);
+                resultsBody.innerHTML = `<tr><td colspan="7" class="empty">Error loading results</td></tr>`;
             }
         }
-        
+
         async function createSchedule() {
             const type = document.getElementById('schedule-type').value;
             const agentId = document.getElementById('agent-id').value.trim();
             const message = document.getElementById('message').value.trim();
             const errorDiv = document.getElementById('create-error');
-            
+
             errorDiv.textContent = '';
-            
+
             if (!agentId || !message) {
-                errorDiv.textContent = 'Please fill in all fields';
+                errorDiv.textContent = 'Please fill in all required fields';
                 return;
             }
-            
+
             try {
                 const payload = {
                     agent_id: agentId,
                     message: message,
                     role: 'user'
                 };
-                
+
                 if (type === 'onetime') {
                     const executeAt = document.getElementById('execute-at').value;
                     const timezone = document.getElementById('timezone').value;
-                    
+
                     if (!executeAt) {
                         errorDiv.textContent = 'Please specify execution time';
                         return;
                     }
-                    
-                    // Convert datetime-local to ISO 8601 with timezone handling
+
                     let executeDate;
                     if (timezone === 'local') {
-                        // Use local browser timezone
                         executeDate = new Date(executeAt);
                     } else if (timezone === 'UTC') {
-                        // Treat input as UTC
                         executeDate = new Date(executeAt + 'Z');
                     } else {
-                        // For named timezones, we assume the datetime-local is in that timezone
-                        // Convert to UTC by parsing as local and adjusting
                         executeDate = new Date(executeAt);
-                        // Note: This is a simplification. For accurate timezone conversion,
-                        // we'd need a library, but for now we assume UTC or local
                     }
-                    
+
                     payload.execute_at = executeDate.toISOString();
                 } else {
                     const cron = document.getElementById('cron').value.trim();
@@ -539,8 +600,9 @@ PROTOCOL: REST API + SCHEDULED EXECUTION</pre>
                         return;
                     }
                     payload.cron = cron;
+                    payload.timezone = document.getElementById('recurring-timezone').value;
                 }
-                
+
                 const endpoint = type === 'onetime' ? '/schedules/one-time' : '/schedules/recurring';
                 const response = await fetch(`${API_BASE}${endpoint}`, {
                     method: 'POST',
@@ -550,43 +612,43 @@ PROTOCOL: REST API + SCHEDULED EXECUTION</pre>
                     },
                     body: JSON.stringify(payload)
                 });
-                
+
                 if (!response.ok) {
                     const error = await response.json();
                     throw new Error(error.detail || 'Failed to create schedule');
                 }
-                
-                alert('SCHEDULE CREATED SUCCESSFULLY');
+
                 document.getElementById('agent-id').value = '';
                 document.getElementById('message').value = '';
                 document.getElementById('execute-at').value = '';
                 document.getElementById('cron').value = '';
-                
+                document.getElementById('recurring-timezone').value = 'UTC';
+
                 showTab('schedules');
+                document.querySelector('.tab').click();
                 loadSchedules();
             } catch (error) {
-                errorDiv.textContent = 'Error: ' + error.message;
+                errorDiv.textContent = error.message;
             }
         }
-        
+
         async function deleteSchedule(type, id) {
-            if (!confirm('CONFIRM: Delete this schedule?')) return;
-            
+            if (!confirm('Delete this schedule?')) return;
+
             try {
                 const response = await fetch(`${API_BASE}/schedules/${type}/${id}`, {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${API_KEY}` }
                 });
-                
+
                 if (!response.ok) throw new Error('Failed to delete');
-                
-                alert('SCHEDULE DELETED');
+
                 loadSchedules();
             } catch (error) {
-                alert('ERROR DELETING SCHEDULE: ' + error.message);
+                alert('Error: ' + error.message);
             }
         }
-        
+
         function truncate(str, len) {
             return str.length > len ? str.substring(0, len) + '...' : str;
         }

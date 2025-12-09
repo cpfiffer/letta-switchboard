@@ -9,6 +9,7 @@ class RecurringScheduleCreate(BaseModel):
     cron: str
     message: str
     role: str = "user"
+    timezone: str = "UTC"
 
 
 class RecurringSchedule(BaseModel):
@@ -18,6 +19,7 @@ class RecurringSchedule(BaseModel):
     cron: str
     message: str
     role: str = "user"
+    timezone: str = "UTC"
     created_at: datetime = Field(default_factory=datetime.utcnow)
     last_run: Optional[datetime] = None
 
