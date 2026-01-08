@@ -110,7 +110,7 @@ async def health():
 @app.function(
     image=image,
     secrets=[],  # No secrets needed anymore!
-    keep_warm=1,  # Keep one instance warm
+    min_containers=1,  # Keep one instance warm
 )
 @modal.asgi_app()
 def api():
