@@ -614,29 +614,30 @@
                 }
                 
                 const data = await response.json();
-                const schedules = data.scheduled_messages || [];
+                console.log('Letta API response:', data); // Debug log
+                const schedules = data.scheduled_messages || data.schedules || data || [];
                 
                 // Split into one-time and recurring
-                const onetime = schedules.filter(s => s.schedule.type === 'one-time');
-                const recurring = schedules.filter(s => s.schedule.type === 'recurring');
+                const onetime = schedules.filter(s => s.schedule?.type === 'one-time');
+                const recurring = schedules.filter(s => s.schedule?.type === 'recurring');
 
                 onetimeBody.innerHTML = onetime.length ? onetime.map(s => `
                     <tr>
-                        <td class="mono">${s.id.substring(0, 8)}...</td>
-                        <td class="mono">${s.agent_id}</td>
-                        <td>${fromUnixMs(s.next_scheduled_at)}</td>
-                        <td>${truncate(s.messages[0]?.content || '', 50)}</td>
+                        <td class="mono">${s.id?.substring(0, 8) || 'N/A'}...</td>
+                        <td class="mono">${s.agent_id || 'N/A'}</td>
+                        <td>${s.next_scheduled_at ? fromUnixMs(s.next_scheduled_at) : 'N/A'}</td>
+                        <td>${truncate(s.messages?.[0]?.content || s.message || 'N/A', 50)}</td>
                         <td><button class="danger sm" onclick="deleteSchedule('${s.id}')">Delete</button></td>
                     </tr>
                 `).join('') : '<tr><td colspan="5" class="empty">No one-time schedules</td></tr>';
 
                 recurringBody.innerHTML = recurring.length ? recurring.map(s => `
                     <tr>
-                        <td class="mono">${s.id.substring(0, 8)}...</td>
-                        <td class="mono">${s.agent_id}</td>
-                        <td class="mono">${s.schedule.cron_expression}</td>
+                        <td class="mono">${s.id?.substring(0, 8) || 'N/A'}...</td>
+                        <td class="mono">${s.agent_id || 'N/A'}</td>
+                        <td class="mono">${s.schedule?.cron_expression || 'N/A'}</td>
                         <td>UTC</td>
-                        <td>${truncate(s.messages[0]?.content || '', 50)}</td>
+                        <td>${truncate(s.messages?.[0]?.content || s.message || 'N/A', 50)}</td>
                         <td>${s.next_scheduled_at ? fromUnixMs(s.next_scheduled_at) : 'Never'}</td>
                         <td><button class="danger sm" onclick="deleteSchedule('${s.id}')">Delete</button></td>
                     </tr>
