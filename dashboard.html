@@ -565,6 +565,7 @@
         const LETTA_API = 'https://api.letta.com/v1';
         let API_KEY = sessionStorage.getItem('letta_api_key') || '';
         let DEFAULT_AGENT_ID = sessionStorage.getItem('default_agent_id') || '';
+        let CURRENT_SCHEDULES = []; // Store schedules for modal viewing
 
         // Initialize
         if (API_KEY) {
@@ -704,30 +705,39 @@
                 console.log('Letta API response:', data); // Debug log
                 const schedules = data.scheduled_messages || data.schedules || data || [];
                 
+                // Store for modal viewing
+                CURRENT_SCHEDULES = schedules;
+                
                 // Debug: Log first schedule if available
                 if (schedules.length > 0) {
                     console.log('First schedule:', schedules[0]);
                     console.log('First schedule messages:', schedules[0].messages);
+                    console.log('Full schedule object:', JSON.stringify(schedules[0], null, 2));
                 }
                 
                 // Split into one-time and recurring
                 const onetime = schedules.filter(s => s.schedule?.type === 'one-time');
                 const recurring = schedules.filter(s => s.schedule?.type === 'recurring');
 
-                onetimeBody.innerHTML = onetime.length ? onetime.map(s => `
+                onetimeBody.innerHTML = onetime.length ? onetime.map((s, idx) => {
+                    const globalIdx = CURRENT_SCHEDULES.indexOf(s);
+                    return `
                     <tr>
                         <td class="mono">${s.id?.substring(0, 8) || 'N/A'}...</td>
                         <td class="mono">${s.agent_id || 'N/A'}</td>
                         <td>${s.next_scheduled_at ? fromUnixMs(s.next_scheduled_at) : 'N/A'}</td>
                         <td>${truncate(getMessageContent(s), 30)}</td>
                         <td>
-                            <button class="secondary sm" onclick='viewSchedule(\`${encodeURIComponent(JSON.stringify(s))}\`)'>View</button>
+                            <button class="secondary sm" onclick="viewSchedule(${globalIdx})">View</button>
                             <button class="danger sm" onclick="deleteSchedule('${s.id}')">Delete</button>
                         </td>
                     </tr>
-                `).join('') : '<tr><td colspan="5" class="empty">No one-time schedules</td></tr>';
+                    `;
+                }).join('') : '<tr><td colspan="5" class="empty">No one-time schedules</td></tr>';
 
-                recurringBody.innerHTML = recurring.length ? recurring.map(s => `
+                recurringBody.innerHTML = recurring.length ? recurring.map((s, idx) => {
+                    const globalIdx = CURRENT_SCHEDULES.indexOf(s);
+                    return `
                     <tr>
                         <td class="mono">${s.id?.substring(0, 8) || 'N/A'}...</td>
                         <td class="mono">${s.agent_id || 'N/A'}</td>
@@ -736,11 +746,12 @@
                         <td>${truncate(getMessageContent(s), 30)}</td>
                         <td>${s.next_scheduled_at ? fromUnixMs(s.next_scheduled_at) : 'Never'}</td>
                         <td>
-                            <button class="secondary sm" onclick='viewSchedule(\`${encodeURIComponent(JSON.stringify(s))}\`)'>View</button>
+                            <button class="secondary sm" onclick="viewSchedule(${globalIdx})">View</button>
                             <button class="danger sm" onclick="deleteSchedule('${s.id}')">Delete</button>
                         </td>
                     </tr>
-                `).join('') : '<tr><td colspan="7" class="empty">No recurring schedules</td></tr>';
+                    `;
+                }).join('') : '<tr><td colspan="7" class="empty">No recurring schedules</td></tr>';
             } catch (error) {
                 onetimeBody.innerHTML = `<tr><td colspan="5" class="empty">Error: ${error.message}</td></tr>`;
                 recurringBody.innerHTML = `<tr><td colspan="7" class="empty">Error: ${error.message}</td></tr>`;
@@ -882,8 +893,14 @@
             return str.length > len ? str.substring(0, len) + '...' : str;
         }
         
-        function viewSchedule(scheduleData) {
-            const schedule = JSON.parse(decodeURIComponent(scheduleData));
+        function viewSchedule(scheduleIndex) {
+            const schedule = CURRENT_SCHEDULES[scheduleIndex];
+            if (!schedule) {
+                alert('Schedule not found');
+                return;
+            }
+            
+            console.log('Viewing schedule:', schedule); // Debug
             
             document.getElementById('modal-id').textContent = schedule.id || 'N/A';
             document.getElementById('modal-agent-id').textContent = schedule.agent_id || 'N/A';
@@ -898,19 +915,35 @@
                     `Cron: ${schedule.schedule.cron_expression}\nNext run: ${schedule.next_scheduled_at ? fromUnixMs(schedule.next_scheduled_at) : 'Never'}`;
             }
             
-            // Format messages
+            // Format messages - handle different formats
             const messagesEl = document.getElementById('modal-messages');
-            if (schedule.messages && Array.isArray(schedule.messages)) {
-                messagesEl.innerHTML = schedule.messages.map((msg, idx) => `
+            
+            // Check all possible message fields
+            console.log('Messages field:', schedule.messages);
+            console.log('Message field:', schedule.message);
+            console.log('Raw schedule:', JSON.stringify(schedule, null, 2));
+            
+            if (schedule.messages && Array.isArray(schedule.messages) && schedule.messages.length > 0) {
+                messagesEl.innerHTML = schedule.messages.map((msg, idx) => {
+                    const content = typeof msg === 'string' ? msg : 
+                                  (msg.content || msg.text || JSON.stringify(msg));
+                    const role = typeof msg === 'object' ? (msg.role || 'user') : 'user';
+                    return `
                     <div style="margin-bottom: 12px; padding: 12px; background: #f5f5f5; border-radius: 4px;">
                         <div style="font-weight: 600; margin-bottom: 4px;">Message ${idx + 1}</div>
-                        <div><strong>Role:</strong> ${msg.role || 'user'}</div>
+                        <div><strong>Role:</strong> ${role}</div>
                         <div style="margin-top: 4px;"><strong>Content:</strong></div>
-                        <div style="white-space: pre-wrap;">${typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content, null, 2)}</div>
+                        <div style="white-space: pre-wrap;">${typeof content === 'string' ? content : JSON.stringify(content, null, 2)}</div>
                     </div>
-                `).join('');
+                    `;
+                }).join('');
+            } else if (schedule.message) {
+                // Single message field
+                const content = typeof schedule.message === 'string' ? schedule.message : JSON.stringify(schedule.message, null, 2);
+                messagesEl.innerHTML = `<div style="white-space: pre-wrap;">${content}</div>`;
             } else {
-                messagesEl.textContent = getMessageContent(schedule);
+                // Show raw data for debugging
+                messagesEl.innerHTML = `<div style="white-space: pre-wrap; font-family: monospace; font-size: 12px;">${JSON.stringify(schedule, null, 2)}</div>`;
             }
             
             document.getElementById('schedule-modal').classList.add('active');
