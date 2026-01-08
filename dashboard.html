@@ -501,8 +501,11 @@
             sessionStorage.setItem('letta_api_key', API_KEY);
             document.getElementById('main-content').classList.remove('hidden');
             showStatus('api-key-status', 'Connected successfully', 'success');
-            loadSchedules();
-            loadResults();
+            
+            // Only auto-load if we have a saved agent ID
+            if (DEFAULT_AGENT_ID) {
+                loadSchedules();
+            }
         }
 
         function clearApiKey() {
@@ -534,7 +537,10 @@
         async function loadSchedules() {
             const agentId = document.getElementById('agent-id').value.trim();
             if (!agentId) {
-                alert('Please enter an Agent ID first');
+                const onetimeBody = document.querySelector('#onetime-table tbody');
+                const recurringBody = document.querySelector('#recurring-table tbody');
+                onetimeBody.innerHTML = '<tr><td colspan="5" class="empty">Enter an Agent ID and click Refresh to view schedules</td></tr>';
+                recurringBody.innerHTML = '<tr><td colspan="7" class="empty">Enter an Agent ID and click Refresh to view schedules</td></tr>';
                 return;
             }
             
