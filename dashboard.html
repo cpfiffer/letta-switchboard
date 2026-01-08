@@ -41,6 +41,62 @@
             color: #1a1a1a;
         }
         
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .modal-close {
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        .modal-close:hover {
+            color: #1a1a1a;
+        }
+        .modal-body {
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .modal-label {
+            font-weight: 600;
+            margin-top: 12px;
+            margin-bottom: 4px;
+            color: #666;
+        }
+        
         /* Migration Banner */
         .migration-banner {
             background: #fff3cd;
@@ -115,6 +171,11 @@
             font-weight: 500;
         }
         button:hover { background: #333; }
+        button.sm {
+            padding: 4px 12px;
+            font-size: 13px;
+            margin-left: 4px;
+        }
         button.secondary {
             background: white;
             color: #1a1a1a;
@@ -474,6 +535,32 @@
         </div>
     </div>
 
+    <!-- Modal for viewing schedule details -->
+    <div id="schedule-modal" class="modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Schedule Details</h3>
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="modal-label">Schedule ID</div>
+                <div id="modal-id" class="mono"></div>
+                
+                <div class="modal-label">Agent ID</div>
+                <div id="modal-agent-id" class="mono"></div>
+                
+                <div class="modal-label">Type</div>
+                <div id="modal-type"></div>
+                
+                <div class="modal-label">Schedule</div>
+                <div id="modal-schedule"></div>
+                
+                <div class="modal-label">Messages</div>
+                <div id="modal-messages"></div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const LETTA_API = 'https://api.letta.com/v1';
         let API_KEY = sessionStorage.getItem('letta_api_key') || '';
@@ -632,8 +719,11 @@
                         <td class="mono">${s.id?.substring(0, 8) || 'N/A'}...</td>
                         <td class="mono">${s.agent_id || 'N/A'}</td>
                         <td>${s.next_scheduled_at ? fromUnixMs(s.next_scheduled_at) : 'N/A'}</td>
-                        <td>${truncate(getMessageContent(s), 50)}</td>
-                        <td><button class="danger sm" onclick="deleteSchedule('${s.id}')">Delete</button></td>
+                        <td>${truncate(getMessageContent(s), 30)}</td>
+                        <td>
+                            <button class="secondary sm" onclick='viewSchedule(\`${encodeURIComponent(JSON.stringify(s))}\`)'>View</button>
+                            <button class="danger sm" onclick="deleteSchedule('${s.id}')">Delete</button>
+                        </td>
                     </tr>
                 `).join('') : '<tr><td colspan="5" class="empty">No one-time schedules</td></tr>';
 
@@ -643,9 +733,12 @@
                         <td class="mono">${s.agent_id || 'N/A'}</td>
                         <td class="mono">${s.schedule?.cron_expression || 'N/A'}</td>
                         <td>UTC</td>
-                        <td>${truncate(getMessageContent(s), 50)}</td>
+                        <td>${truncate(getMessageContent(s), 30)}</td>
                         <td>${s.next_scheduled_at ? fromUnixMs(s.next_scheduled_at) : 'Never'}</td>
-                        <td><button class="danger sm" onclick="deleteSchedule('${s.id}')">Delete</button></td>
+                        <td>
+                            <button class="secondary sm" onclick='viewSchedule(\`${encodeURIComponent(JSON.stringify(s))}\`)'>View</button>
+                            <button class="danger sm" onclick="deleteSchedule('${s.id}')">Delete</button>
+                        </td>
                     </tr>
                 `).join('') : '<tr><td colspan="7" class="empty">No recurring schedules</td></tr>';
             } catch (error) {
@@ -787,6 +880,46 @@
             if (!str) return '';
             if (typeof str === 'object') str = JSON.stringify(str);
             return str.length > len ? str.substring(0, len) + '...' : str;
+        }
+        
+        function viewSchedule(scheduleData) {
+            const schedule = JSON.parse(decodeURIComponent(scheduleData));
+            
+            document.getElementById('modal-id').textContent = schedule.id || 'N/A';
+            document.getElementById('modal-agent-id').textContent = schedule.agent_id || 'N/A';
+            document.getElementById('modal-type').textContent = schedule.schedule?.type || 'N/A';
+            
+            // Format schedule details
+            if (schedule.schedule?.type === 'one-time') {
+                const time = schedule.next_scheduled_at ? fromUnixMs(schedule.next_scheduled_at) : 'N/A';
+                document.getElementById('modal-schedule').textContent = time;
+            } else if (schedule.schedule?.type === 'recurring') {
+                document.getElementById('modal-schedule').textContent = 
+                    `Cron: ${schedule.schedule.cron_expression}\nNext run: ${schedule.next_scheduled_at ? fromUnixMs(schedule.next_scheduled_at) : 'Never'}`;
+            }
+            
+            // Format messages
+            const messagesEl = document.getElementById('modal-messages');
+            if (schedule.messages && Array.isArray(schedule.messages)) {
+                messagesEl.innerHTML = schedule.messages.map((msg, idx) => `
+                    <div style="margin-bottom: 12px; padding: 12px; background: #f5f5f5; border-radius: 4px;">
+                        <div style="font-weight: 600; margin-bottom: 4px;">Message ${idx + 1}</div>
+                        <div><strong>Role:</strong> ${msg.role || 'user'}</div>
+                        <div style="margin-top: 4px;"><strong>Content:</strong></div>
+                        <div style="white-space: pre-wrap;">${typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content, null, 2)}</div>
+                    </div>
+                `).join('');
+            } else {
+                messagesEl.textContent = getMessageContent(schedule);
+            }
+            
+            document.getElementById('schedule-modal').classList.add('active');
+        }
+        
+        function closeModal(event) {
+            if (!event || event.target.id === 'schedule-modal' || event.target.classList.contains('modal-close')) {
+                document.getElementById('schedule-modal').classList.remove('active');
+            }
         }
         
         function getMessageContent(schedule) {
