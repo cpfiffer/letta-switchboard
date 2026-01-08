@@ -1,168 +1,177 @@
-# Letta Switchboard
+# Letta Scheduling Dashboard
 
-**Free hosted message routing service for Letta agents.**
+## ⚠️ Important Update: Now Using Letta's Native Scheduling
 
-Send messages to your Letta agents immediately or scheduled for later. Supports natural language scheduling ("in 5 minutes", "every weekday at 9am") and secure cross-agent communication.
+**Letta now provides built-in scheduling!** This project has been simplified to a web dashboard that calls Letta's API directly.
 
-🌐 **Hosted Service:** https://letta--switchboard-api.modal.run
-🎛️ **Web Dashboard:** [`/dashboard`](https://letta--switchboard-api.modal.run/dashboard)  
-💻 **CLI:** [`letta-switchboard`](cli/)  
-🔒 **Security:** End-to-end encryption, API key isolation  
-📖 **Docs:** [CLI Guide](cli/README.md) | [API Reference](#api-usage)
+### What Changed?
+
+- ✅ **Dashboard Updated** - Now calls Letta API directly from your browser
+- ❌ **Old API Deprecated** - Backend scheduling endpoints return 410 Gone
+- ➡️ **Migration Required** - Use Letta's native scheduling API
+
+### Quick Links
+
+🎛️ **Web Dashboard:** https://letta--switchboard-api.modal.run/dashboard  
+📖 **Letta Scheduling Docs:** https://docs.letta.com/guides/agents/scheduling/  
+💻 **GitHub:** https://github.com/cpfiffer/letta-switchboard
+
+---
+
+## Migration Guide
+
+### For Dashboard Users
+
+The dashboard now calls Letta's API directly! Just continue using it - no changes needed.
+
+1. Visit https://letta--switchboard-api.modal.run/dashboard
+2. Enter your Letta API key and agent ID
+3. Create schedules as before
+
+### For API Users
+
+If you were calling the old Switchboard API, you need to migrate to Letta's native API:
+
+**Old Endpoint (Deprecated):**
+```bash
+POST https://letta--switchboard-api.modal.run/schedules/one-time
+{
+  "agent_id": "agent-xxx",
+  "execute_at": "2025-11-13T09:00:00Z",
+  "message": "Hello",
+  "role": "user"
+}
+```
+
+**New Endpoint (Use This):**
+```bash
+POST https://api.letta.com/v1/agents/agent-xxx/schedule
+{
+  "schedule": {
+    "type": "one-time",
+    "scheduled_at": 1731499200000
+  },
+  "messages": [{
+    "role": "user",
+    "content": "Hello"
+  }]
+}
+```
+
+**Key Changes:**
+- `execute_at` (ISO string) → `scheduled_at` (Unix milliseconds)
+- `message` (string) → `messages` (array of message objects)
+- Cron expressions unchanged (still 5-field format)
+
+**Full Documentation:** https://docs.letta.com/guides/agents/scheduling/
+
+---
 
 ## Quick Start
 
-### Option 1: Web Dashboard (Easiest)
+### Use the Web Dashboard
 
-Visit the dashboard in your browser: **[https://letta--switchboard-api.modal.run/dashboard](https://letta--switchboard-api.modal.run/dashboard)**
+Visit **[https://letta--switchboard-api.modal.run/dashboard](https://letta--switchboard-api.modal.run/dashboard)**
 
 1. Enter your Letta API key (stored in browser session only)
-2. View all your schedules with loading indicators
-3. Create new schedules with timezone support
-4. View execution results with success/failed status badges
-5. Delete schedules with confirmation dialog
-6. Refresh data anytime
+2. Enter your agent ID
+3. View, create, and delete schedules
+4. Dashboard calls Letta's API directly from your browser
 
 Features:
-- **Timezone support** - Local browser time, UTC, or major timezones
-- **Loading indicators** - Visual feedback while fetching data
-- **Status badges** - See successful vs failed executions at a glance
-- **No installation** - Just visit the URL in your browser!
+- **Direct Letta API integration** - No backend needed
+- **Timezone support** - Local browser time, UTC, or major timezones  
+- **Simple interface** - Clean, easy-to-use dashboard
+- **No installation** - Just visit the URL!
 
-### Option 2: Using cURL (No Installation Required)
+### Use Letta's API Directly
 
-Send a message right now with just cURL:
+For programmatic access, use Letta's scheduling API:
 
+**Create a one-time schedule:**
 ```bash
-curl -X POST https://letta--switchboard-api.modal.run/schedules/one-time \
-  -H "Content-Type: application/json" \
+curl -X POST https://api.letta.com/v1/agents/agent-xxx/schedule \
   -H "Authorization: Bearer YOUR_LETTA_API_KEY" \
+  -H "Content-Type: application/json" \
   -d '{
-    "agent_id": "agent-xxx",
-    "execute_at": "2025-11-12T20:00:00Z",
-    "message": "Hello from Switchboard!",
-    "role": "user"
+    "schedule": {
+      "type": "one-time",
+      "scheduled_at": 1731499200000
+    },
+    "messages": [{
+      "role": "user",
+      "content": "Hello!"
+    }]
   }'
 ```
 
-Or create a recurring schedule:
-
+**Create a recurring schedule:**
 ```bash
-curl -X POST https://letta--switchboard-api.modal.run/schedules/recurring \
-  -H "Content-Type: application/json" \
+curl -X POST https://api.letta.com/v1/agents/agent-xxx/schedule \
   -H "Authorization: Bearer YOUR_LETTA_API_KEY" \
+  -H "Content-Type: application/json" \
   -d '{
-    "agent_id": "agent-xxx",
-    "cron": "0 9 * * 1-5",
-    "message": "Daily standup reminder",
-    "role": "user"
+    "schedule": {
+      "type": "recurring",
+      "cron_expression": "0 9 * * 1-5"
+    },
+    "messages": [{
+      "role": "user",
+      "content": "Daily standup"
+    }]
   }'
 ```
 
-**Check your schedules:**
-
+**List schedules:**
 ```bash
-# List all one-time schedules
-curl https://letta--switchboard-api.modal.run/schedules/one-time \
-  -H "Authorization: Bearer YOUR_LETTA_API_KEY"
-
-# List all recurring schedules
-curl https://letta--switchboard-api.modal.run/schedules/recurring \
-  -H "Authorization: Bearer YOUR_LETTA_API_KEY"
-
-# View execution results
-curl https://letta--switchboard-api.modal.run/results \
+curl https://api.letta.com/v1/agents/agent-xxx/schedule \
   -H "Authorization: Bearer YOUR_LETTA_API_KEY"
 ```
 
-**Note:** 
-- Replace `YOUR_LETTA_API_KEY` with your actual Letta API key
-- Replace `agent-xxx` with your agent ID
-- The API key in the Authorization header is used for authentication and storage isolation
-- You don't need to include it in the request body!
-
-**Pro tip:** Use the CLI for natural language scheduling - it's much easier than writing ISO timestamps and cron expressions!
-
-### Option 3: Using the CLI (Advanced)
-
-The CLI makes natural language scheduling much easier:
-
+**Delete a schedule:**
 ```bash
-# Download the CLI (or build from source)
-cd cli
-go build -o letta-switchboard
-
-# Configure with your Letta API key
-./letta-switchboard config set-api-key sk-your-letta-key
+curl -X DELETE https://api.letta.com/v1/agents/agent-xxx/schedule/SCHEDULE_ID \
+  -H "Authorization: Bearer YOUR_LETTA_API_KEY"
 ```
 
-**Send messages with natural language:**
+**Full Documentation:** https://docs.letta.com/guides/agents/scheduling/
 
-```bash
-# Send immediately
-letta-switchboard send \
-  --agent-id agent-xxx \
-  --message "Hello from Switchboard!"
+## What is This?
 
-# Send later (natural language!)
-letta-switchboard send \
-  --agent-id agent-xxx \
-  --message "Reminder to check in" \
-  --execute-at "tomorrow at 9am"
+A simple web dashboard for managing Letta agent schedules. The dashboard calls Letta's native scheduling API directly from your browser.
 
-# Create recurring schedule (plain English!)
-letta-switchboard recurring create \
-  --agent-id agent-xxx \
-  --message "Daily standup" \
-  --cron "every weekday at 10am"
-```
+### Features
 
-That's it! The hosted service handles everything - scheduling, execution, and delivery.
+✅ **Web Dashboard** - Clean interface for managing schedules  
+✅ **Direct Letta Integration** - Calls Letta API from browser  
+✅ **No Backend** - Pure client-side (except for hosting the HTML)  
+✅ **Timezone Support** - Schedule in local time or UTC  
+✅ **Free to Use** - Just visit the URL
 
-## Features
+### Why Use This Dashboard?
 
-✅ **Free hosted service** - No deployment needed  
-✅ **Natural language scheduling** - "in 5 minutes", "tomorrow at 9am", "every weekday"  
-✅ **Secure by default** - API key isolation, encrypted storage  
-✅ **Recurring schedules** - Cron expressions or plain English  
-✅ **Instant delivery** - Messages execute within 1 minute  
-✅ **Execution tracking** - Get run IDs for every message  
-✅ **Self-hostable** - Deploy your own instance if needed
+**Easy to Use**  
+Simple interface for creating and managing Letta schedules without writing API calls.
 
-## Why Use Switchboard?
+**No Installation**  
+Just visit the URL - no setup, no configuration, no CLI to install.
 
-**No Infrastructure Setup**  
-Just use the hosted service at `https://letta--switchboard-api.modal.run`. No deployment, no servers, no configuration.
-
-**Natural Language Scheduling**  
-Forget cron syntax. Use plain English like "every weekday at 9am" or "in 5 minutes".
-
-**Secure by Design**  
-- Your schedules are isolated by API key
-- End-to-end encryption at rest
-- Only you can see your schedules
-- Execution results tracked with run IDs
-
-**Always Available**  
-- Runs on Modal's infrastructure
-- Checks every minute for due schedules
-- Automatic retries and error handling
-- 99.9% uptime
+**Direct Letta API**  
+Your schedules are stored and executed by Letta Cloud. Check execution history at https://app.letta.com
 
 ## How It Works
 
-1. **You create a schedule** → Via CLI or API with your Letta API key
-2. **Switchboard validates** → Checks your API key against Letta's API
-3. **Schedule stored** → Encrypted and isolated in your hash-based directory
-4. **Cron checks every minute** → Looks for due schedules in your bucket
-5. **Message sent** → Calls Letta's API with your credentials to send the message
-6. **Result saved** → Stores run ID and execution metadata
+1. **Visit the dashboard** → https://letta--switchboard-api.modal.run/dashboard
+2. **Enter credentials** → Your Letta API key and agent ID
+3. **Create schedules** → Dashboard calls Letta API from your browser
+4. **Letta executes** → Letta Cloud handles scheduling and execution
+5. **Check results** → View execution history at https://app.letta.com
 
-**Security Model:**
-- Your API key is validated but never stored in plaintext
-- Schedules hashed by API key for isolation
-- Only you can list/view/delete your schedules
-- Messages sent using your API key (you stay in control)
+**Architecture:**
+- Dashboard is pure client-side JavaScript
+- API calls go directly to Letta (https://api.letta.com)
+- No Switchboard backend involved in scheduling
+- Your API key never leaves your browser (stored in session storage)
 
 ## Natural Language Examples
 

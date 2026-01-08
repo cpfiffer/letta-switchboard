@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Switchboard Dashboard</title>
+    <title>Letta Scheduling Dashboard</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -39,6 +39,30 @@
         }
         .header-links a:hover {
             color: #1a1a1a;
+        }
+        
+        /* Migration Banner */
+        .migration-banner {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        .migration-banner h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #856404;
+        }
+        .migration-banner p {
+            font-size: 14px;
+            color: #856404;
+            margin-bottom: 8px;
+        }
+        .migration-banner a {
+            color: #856404;
+            font-weight: 600;
         }
 
         h2 {
@@ -271,11 +295,21 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Switchboard Dashboard</h1>
+            <h1>Letta Scheduling Dashboard</h1>
             <div class="header-links">
                 <a href="/">Home</a>
-                <a href="https://github.com/cpfiffer/letta-switchboard">Docs</a>
+                <a href="https://docs.letta.com/guides/agents/scheduling/" target="_blank">Letta Docs</a>
+                <a href="https://github.com/cpfiffer/letta-switchboard">GitHub</a>
             </div>
+        </div>
+        
+        <!-- Migration Notice -->
+        <div class="migration-banner">
+            <h3>✨ Now powered by Letta's native scheduling!</h3>
+            <p>
+                This dashboard now calls Letta's API directly. The old Switchboard backend has been deprecated.
+                Read the <a href="https://docs.letta.com/guides/agents/scheduling/" target="_blank">full scheduling docs →</a>
+            </p>
         </div>
 
         <!-- API Key Input -->
@@ -434,15 +468,28 @@
     </div>
 
     <script>
-        const API_BASE = window.location.origin;
+        const LETTA_API = 'https://api.letta.com/v1';
         let API_KEY = sessionStorage.getItem('letta_api_key') || '';
+        let DEFAULT_AGENT_ID = sessionStorage.getItem('default_agent_id') || '';
 
         // Initialize
         if (API_KEY) {
             document.getElementById('api-key-input').value = API_KEY;
             document.getElementById('main-content').classList.remove('hidden');
-            loadSchedules();
-            loadResults();
+            if (DEFAULT_AGENT_ID) {
+                document.getElementById('agent-id').value = DEFAULT_AGENT_ID;
+                loadSchedules();
+            }
+        }
+        
+        // Helper: Convert ISO timestamp to Unix milliseconds
+        function toUnixMs(isoString) {
+            return new Date(isoString).getTime();
+        }
+        
+        // Helper: Convert Unix milliseconds to readable date
+        function fromUnixMs(ms) {
+            return new Date(ms).toLocaleString();
         }
 
         function saveApiKey() {
@@ -485,6 +532,16 @@
         }
 
         async function loadSchedules() {
+            const agentId = document.getElementById('agent-id').value.trim();
+            if (!agentId) {
+                alert('Please enter an Agent ID first');
+                return;
+            }
+            
+            // Save for next time
+            sessionStorage.setItem('default_agent_id', agentId);
+            DEFAULT_AGENT_ID = agentId;
+            
             const onetimeBody = document.querySelector('#onetime-table tbody');
             const recurringBody = document.querySelector('#recurring-table tbody');
 
@@ -492,22 +549,29 @@
             recurringBody.innerHTML = '<tr><td colspan="7" class="loading"><div class="spinner"></div><p>Loading...</p></td></tr>';
 
             try {
-                const [onetime, recurring] = await Promise.all([
-                    fetch(`${API_BASE}/schedules/one-time`, {
-                        headers: { 'Authorization': `Bearer ${API_KEY}` }
-                    }).then(r => r.json()),
-                    fetch(`${API_BASE}/schedules/recurring`, {
-                        headers: { 'Authorization': `Bearer ${API_KEY}` }
-                    }).then(r => r.json())
-                ]);
+                // Letta API returns all schedules (one-time and recurring) in a single call
+                const response = await fetch(`${LETTA_API}/agents/${agentId}/schedule`, {
+                    headers: { 'Authorization': `Bearer ${API_KEY}` }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to load schedules: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                const schedules = data.scheduled_messages || [];
+                
+                // Split into one-time and recurring
+                const onetime = schedules.filter(s => s.schedule.type === 'one-time');
+                const recurring = schedules.filter(s => s.schedule.type === 'recurring');
 
                 onetimeBody.innerHTML = onetime.length ? onetime.map(s => `
                     <tr>
                         <td class="mono">${s.id.substring(0, 8)}...</td>
                         <td class="mono">${s.agent_id}</td>
-                        <td>${new Date(s.execute_at).toLocaleString()}</td>
-                        <td>${truncate(s.message, 50)}</td>
-                        <td><button class="danger sm" onclick="deleteSchedule('one-time', '${s.id}')">Delete</button></td>
+                        <td>${fromUnixMs(s.next_scheduled_at)}</td>
+                        <td>${truncate(s.messages[0]?.content || '', 50)}</td>
+                        <td><button class="danger sm" onclick="deleteSchedule('${s.id}')">Delete</button></td>
                     </tr>
                 `).join('') : '<tr><td colspan="5" class="empty">No one-time schedules</td></tr>';
 
@@ -515,43 +579,25 @@
                     <tr>
                         <td class="mono">${s.id.substring(0, 8)}...</td>
                         <td class="mono">${s.agent_id}</td>
-                        <td class="mono">${s.cron}</td>
-                        <td>${s.timezone || 'UTC'}</td>
-                        <td>${truncate(s.message, 50)}</td>
-                        <td>${s.last_run ? new Date(s.last_run).toLocaleString() : 'Never'}</td>
-                        <td><button class="danger sm" onclick="deleteSchedule('recurring', '${s.id}')">Delete</button></td>
+                        <td class="mono">${s.schedule.cron_expression}</td>
+                        <td>UTC</td>
+                        <td>${truncate(s.messages[0]?.content || '', 50)}</td>
+                        <td>${s.next_scheduled_at ? fromUnixMs(s.next_scheduled_at) : 'Never'}</td>
+                        <td><button class="danger sm" onclick="deleteSchedule('${s.id}')">Delete</button></td>
                     </tr>
                 `).join('') : '<tr><td colspan="7" class="empty">No recurring schedules</td></tr>';
             } catch (error) {
-                onetimeBody.innerHTML = `<tr><td colspan="5" class="empty">Error loading schedules</td></tr>`;
-                recurringBody.innerHTML = `<tr><td colspan="7" class="empty">Error loading schedules</td></tr>`;
+                onetimeBody.innerHTML = `<tr><td colspan="5" class="empty">Error: ${error.message}</td></tr>`;
+                recurringBody.innerHTML = `<tr><td colspan="7" class="empty">Error: ${error.message}</td></tr>`;
             }
         }
 
         async function loadResults() {
             const resultsBody = document.querySelector('#results-table tbody');
-
-            resultsBody.innerHTML = '<tr><td colspan="7" class="loading"><div class="spinner"></div><p>Loading...</p></td></tr>';
-
-            try {
-                const results = await fetch(`${API_BASE}/results`, {
-                    headers: { 'Authorization': `Bearer ${API_KEY}` }
-                }).then(r => r.json());
-
-                resultsBody.innerHTML = results.length ? results.map(r => `
-                    <tr>
-                        <td class="mono">${r.schedule_id.substring(0, 8)}...</td>
-                        <td>${r.schedule_type}</td>
-                        <td><span class="badge ${r.status}">${r.status}</span></td>
-                        <td class="mono">${r.agent_id}</td>
-                        <td>${truncate(r.message, 30)}</td>
-                        <td class="mono">${r.run_id || r.error || '-'}</td>
-                        <td>${new Date(r.executed_at).toLocaleString()}</td>
-                    </tr>
-                `).join('') : '<tr><td colspan="7" class="empty">No execution results</td></tr>';
-            } catch (error) {
-                resultsBody.innerHTML = `<tr><td colspan="7" class="empty">Error loading results</td></tr>`;
-            }
+            resultsBody.innerHTML = '<tr><td colspan="7" class="empty">Results tracking not available yet. Check Letta Cloud dashboard for execution history.</td></tr>';
+            
+            // NOTE: Letta's scheduling API doesn't expose execution history yet
+            // Users should check the Letta Cloud dashboard or use the runs API
         }
 
         async function createSchedule() {
@@ -566,12 +612,18 @@
                 errorDiv.textContent = 'Please fill in all required fields';
                 return;
             }
+            
+            // Save agent ID for convenience
+            sessionStorage.setItem('default_agent_id', agentId);
+            DEFAULT_AGENT_ID = agentId;
 
             try {
+                // Build Letta API format
                 const payload = {
-                    agent_id: agentId,
-                    message: message,
-                    role: 'user'
+                    messages: [{
+                        role: 'user',
+                        content: message
+                    }]
                 };
 
                 if (type === 'onetime') {
@@ -592,19 +644,26 @@
                         executeDate = new Date(executeAt);
                     }
 
-                    payload.execute_at = executeDate.toISOString();
+                    // Convert to Unix milliseconds for Letta API
+                    payload.schedule = {
+                        type: 'one-time',
+                        scheduled_at: executeDate.getTime()
+                    };
                 } else {
                     const cron = document.getElementById('cron').value.trim();
                     if (!cron) {
                         errorDiv.textContent = 'Please specify cron expression';
                         return;
                     }
-                    payload.cron = cron;
-                    payload.timezone = document.getElementById('recurring-timezone').value;
+                    
+                    // Letta uses 5-field cron (no seconds)
+                    payload.schedule = {
+                        type: 'recurring',
+                        cron_expression: cron
+                    };
                 }
 
-                const endpoint = type === 'onetime' ? '/schedules/one-time' : '/schedules/recurring';
-                const response = await fetch(`${API_BASE}${endpoint}`, {
+                const response = await fetch(`${LETTA_API}/agents/${agentId}/schedule`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${API_KEY}`,
@@ -615,15 +674,16 @@
 
                 if (!response.ok) {
                     const error = await response.json();
-                    throw new Error(error.detail || 'Failed to create schedule');
+                    throw new Error(error.detail || error.message || 'Failed to create schedule');
                 }
 
-                document.getElementById('agent-id').value = '';
+                // Clear form
                 document.getElementById('message').value = '';
                 document.getElementById('execute-at').value = '';
                 document.getElementById('cron').value = '';
                 document.getElementById('recurring-timezone').value = 'UTC';
 
+                // Switch to schedules tab
                 showTab('schedules');
                 document.querySelector('.tab').click();
                 loadSchedules();
@@ -632,16 +692,25 @@
             }
         }
 
-        async function deleteSchedule(type, id) {
+        async function deleteSchedule(id) {
             if (!confirm('Delete this schedule?')) return;
+            
+            const agentId = document.getElementById('agent-id').value.trim();
+            if (!agentId) {
+                alert('Agent ID is required');
+                return;
+            }
 
             try {
-                const response = await fetch(`${API_BASE}/schedules/${type}/${id}`, {
+                const response = await fetch(`${LETTA_API}/agents/${agentId}/schedule/${id}`, {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${API_KEY}` }
                 });
 
-                if (!response.ok) throw new Error('Failed to delete');
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || error.message || 'Failed to delete');
+                }
 
                 loadSchedules();
             } catch (error) {
