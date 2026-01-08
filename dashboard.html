@@ -617,6 +617,12 @@
                 console.log('Letta API response:', data); // Debug log
                 const schedules = data.scheduled_messages || data.schedules || data || [];
                 
+                // Debug: Log first schedule if available
+                if (schedules.length > 0) {
+                    console.log('First schedule:', schedules[0]);
+                    console.log('First schedule messages:', schedules[0].messages);
+                }
+                
                 // Split into one-time and recurring
                 const onetime = schedules.filter(s => s.schedule?.type === 'one-time');
                 const recurring = schedules.filter(s => s.schedule?.type === 'recurring');
@@ -626,7 +632,7 @@
                         <td class="mono">${s.id?.substring(0, 8) || 'N/A'}...</td>
                         <td class="mono">${s.agent_id || 'N/A'}</td>
                         <td>${s.next_scheduled_at ? fromUnixMs(s.next_scheduled_at) : 'N/A'}</td>
-                        <td>${truncate(s.messages?.[0]?.content || s.message || 'N/A', 50)}</td>
+                        <td>${truncate(getMessageContent(s), 50)}</td>
                         <td><button class="danger sm" onclick="deleteSchedule('${s.id}')">Delete</button></td>
                     </tr>
                 `).join('') : '<tr><td colspan="5" class="empty">No one-time schedules</td></tr>';
@@ -637,7 +643,7 @@
                         <td class="mono">${s.agent_id || 'N/A'}</td>
                         <td class="mono">${s.schedule?.cron_expression || 'N/A'}</td>
                         <td>UTC</td>
-                        <td>${truncate(s.messages?.[0]?.content || s.message || 'N/A', 50)}</td>
+                        <td>${truncate(getMessageContent(s), 50)}</td>
                         <td>${s.next_scheduled_at ? fromUnixMs(s.next_scheduled_at) : 'Never'}</td>
                         <td><button class="danger sm" onclick="deleteSchedule('${s.id}')">Delete</button></td>
                     </tr>
@@ -778,7 +784,25 @@
         }
 
         function truncate(str, len) {
+            if (!str) return '';
+            if (typeof str === 'object') str = JSON.stringify(str);
             return str.length > len ? str.substring(0, len) + '...' : str;
+        }
+        
+        function getMessageContent(schedule) {
+            // Try different possible message formats
+            if (schedule.messages && Array.isArray(schedule.messages) && schedule.messages.length > 0) {
+                const msg = schedule.messages[0];
+                if (typeof msg === 'string') return msg;
+                if (msg.content) {
+                    if (typeof msg.content === 'string') return msg.content;
+                    if (typeof msg.content === 'object') return JSON.stringify(msg.content);
+                }
+                if (msg.text) return msg.text;
+                return JSON.stringify(msg);
+            }
+            if (schedule.message) return schedule.message;
+            return 'N/A';
         }
     </script>
 </body>
