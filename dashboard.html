@@ -300,11 +300,12 @@
                 <a href="/">Home</a>
                 <a href="https://docs.letta.com/guides/agents/scheduling/" target="_blank">Letta Docs</a>
                 <a href="https://github.com/cpfiffer/letta-switchboard">GitHub</a>
+                <button id="logout-btn" onclick="clearApiKey()" class="secondary" style="display: none;">Logout</button>
             </div>
         </div>
         
         <!-- Migration Notice -->
-        <div class="migration-banner">
+        <div id="migration-banner" class="migration-banner">
             <h3>✨ Now powered by Letta's native scheduling!</h3>
             <p>
                 This dashboard now calls Letta's API directly. The old Switchboard backend has been deprecated.
@@ -333,6 +334,16 @@
 
             <!-- Schedules Tab -->
             <div id="schedules-tab" class="content active">
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="schedules-agent-id">Agent ID</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="schedules-agent-id" placeholder="agent-xxx" style="flex: 1;">
+                            <button onclick="loadSchedulesFromInput()" class="secondary">Load Schedules</button>
+                        </div>
+                    </div>
+                </div>
+                
                 <h2>One-Time Schedules</h2>
                 <div class="table-container">
                     <table id="onetime-table">
@@ -366,8 +377,6 @@
                         <tbody></tbody>
                     </table>
                 </div>
-
-                <button onclick="loadSchedules()" class="secondary">Refresh</button>
             </div>
 
             <!-- Create Tab -->
@@ -461,8 +470,6 @@
                         <tbody></tbody>
                     </table>
                 </div>
-
-                <button onclick="loadResults()" class="secondary">Refresh</button>
             </div>
         </div>
     </div>
@@ -475,9 +482,35 @@
         // Initialize
         if (API_KEY) {
             document.getElementById('api-key-input').value = API_KEY;
-            document.getElementById('main-content').classList.remove('hidden');
+            showAuthenticatedState();
             if (DEFAULT_AGENT_ID) {
                 document.getElementById('agent-id').value = DEFAULT_AGENT_ID;
+                document.getElementById('schedules-agent-id').value = DEFAULT_AGENT_ID;
+                loadSchedules();
+            }
+        }
+        
+        function showAuthenticatedState() {
+            document.getElementById('main-content').classList.remove('hidden');
+            document.getElementById('api-key-section').style.display = 'none';
+            document.getElementById('migration-banner').style.display = 'none';
+            document.getElementById('logout-btn').style.display = 'inline-block';
+        }
+        
+        function showUnauthenticatedState() {
+            document.getElementById('main-content').classList.add('hidden');
+            document.getElementById('api-key-section').style.display = 'block';
+            document.getElementById('migration-banner').style.display = 'block';
+            document.getElementById('logout-btn').style.display = 'none';
+        }
+        
+        function loadSchedulesFromInput() {
+            const agentId = document.getElementById('schedules-agent-id').value.trim();
+            if (agentId) {
+                // Sync to create tab
+                document.getElementById('agent-id').value = agentId;
+                DEFAULT_AGENT_ID = agentId;
+                sessionStorage.setItem('default_agent_id', agentId);
                 loadSchedules();
             }
         }
@@ -499,21 +532,28 @@
                 return;
             }
             sessionStorage.setItem('letta_api_key', API_KEY);
-            document.getElementById('main-content').classList.remove('hidden');
             showStatus('api-key-status', 'Connected successfully', 'success');
             
-            // Only auto-load if we have a saved agent ID
-            if (DEFAULT_AGENT_ID) {
-                loadSchedules();
-            }
+            setTimeout(() => {
+                showAuthenticatedState();
+                // Pre-fill agent ID if saved
+                if (DEFAULT_AGENT_ID) {
+                    document.getElementById('schedules-agent-id').value = DEFAULT_AGENT_ID;
+                    document.getElementById('agent-id').value = DEFAULT_AGENT_ID;
+                    loadSchedules();
+                }
+            }, 500);
         }
 
         function clearApiKey() {
             sessionStorage.removeItem('letta_api_key');
+            sessionStorage.removeItem('default_agent_id');
             API_KEY = '';
+            DEFAULT_AGENT_ID = '';
             document.getElementById('api-key-input').value = '';
-            document.getElementById('main-content').classList.add('hidden');
-            showStatus('api-key-status', 'Disconnected', 'error');
+            document.getElementById('schedules-agent-id').value = '';
+            document.getElementById('agent-id').value = '';
+            showUnauthenticatedState();
         }
 
         function showStatus(elementId, message, type) {
@@ -535,14 +575,23 @@
         }
 
         async function loadSchedules() {
-            const agentId = document.getElementById('agent-id').value.trim();
+            // Try schedules tab input first, then create tab input
+            let agentId = document.getElementById('schedules-agent-id').value.trim();
+            if (!agentId) {
+                agentId = document.getElementById('agent-id').value.trim();
+            }
+            
             if (!agentId) {
                 const onetimeBody = document.querySelector('#onetime-table tbody');
                 const recurringBody = document.querySelector('#recurring-table tbody');
-                onetimeBody.innerHTML = '<tr><td colspan="5" class="empty">Enter an Agent ID and click Refresh to view schedules</td></tr>';
-                recurringBody.innerHTML = '<tr><td colspan="7" class="empty">Enter an Agent ID and click Refresh to view schedules</td></tr>';
+                onetimeBody.innerHTML = '<tr><td colspan="5" class="empty">Enter an Agent ID above and click Load Schedules</td></tr>';
+                recurringBody.innerHTML = '<tr><td colspan="7" class="empty">Enter an Agent ID above and click Load Schedules</td></tr>';
                 return;
             }
+            
+            // Sync both inputs
+            document.getElementById('schedules-agent-id').value = agentId;
+            document.getElementById('agent-id').value = agentId;
             
             // Save for next time
             sessionStorage.setItem('default_agent_id', agentId);
@@ -701,7 +750,10 @@
         async function deleteSchedule(id) {
             if (!confirm('Delete this schedule?')) return;
             
-            const agentId = document.getElementById('agent-id').value.trim();
+            let agentId = document.getElementById('schedules-agent-id').value.trim();
+            if (!agentId) {
+                agentId = document.getElementById('agent-id').value.trim();
+            }
             if (!agentId) {
                 alert('Agent ID is required');
                 return;
